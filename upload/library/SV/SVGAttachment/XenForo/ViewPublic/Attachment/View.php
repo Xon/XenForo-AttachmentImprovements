@@ -12,7 +12,8 @@ class SV_SVGAttachment_XenForo_ViewPublic_Attachment_View extends XFCP_SV_SVGAtt
             'svg' => 'image/svg+xml',
         );
 
-        if (in_array($extension, array_keys($imageTypes)))
+        if (in_array($extension, array_keys($imageTypes)) &&
+            $attachment['thumbnail_width'] && $attachment['thumbnail_height'])
         {
             $this->_response->setHeader('Content-type', $imageTypes[$extension], true);
         }
