@@ -8,21 +8,7 @@ class SV_SVGAttachment_XenForo_Model_Attachment extends XFCP_SV_SVGAttachment_Xe
         $extension = XenForo_Helper_File::getFileExtension($filename);
         if ($extension == 'svg')
         {
-            try
-            {
-                if (method_exists('XenForo_Helper_DevelopmentXml', 'scanFile'))
-                {
-                    $svgfile = XenForo_Helper_DevelopmentXml::scanFile($file->getTempFile());
-                }
-                else
-                {
-                    $svgfile = new SimpleXMLElement($file->getTempFile(), 0, true);
-                }
-            }
-            catch(Exception $e)
-            {
-                return parent::insertUploadedAttachmentData($file, $userId, $extra);
-            }            
+            $svgfile = $this->parseSVG($file->getTempFile());
             if (!empty($svgfile))
             {
                 $width = substr((string)$svgfile['width'], 0, -2);
@@ -52,12 +38,72 @@ class SV_SVGAttachment_XenForo_Model_Attachment extends XFCP_SV_SVGAttachment_Xe
                                                      : $height;
                     SV_SVGAttachment_Globals::$tempThumbFile = $tempThumbFile;
                 }
+                SV_SVGAttachment_Globals::$forcedDimensions = $dimensions;
             }
-
-            SV_SVGAttachment_Globals::$forcedDimensions = $dimensions;
         }
 
         return parent::insertUploadedAttachmentData($file, $userId, $extra);
+    }
+
+    public function parseSVG($filename)
+    {
+        $svgfile = null;
+        try
+        {
+            if (method_exists('XenForo_Helper_DevelopmentXml', 'scanFile'))
+            {
+                $svgfile = XenForo_Helper_DevelopmentXml::scanFile($filename);
+            }
+            else
+            {
+                $svgfile =  new SimpleXMLElement($filename, 0, true);
+            }
+        }
+        catch(Exception $e)
+        {
+            $svgfile= null;
+        }
+        if (empty($svgfile))
+        {
+            return null;
+        }
+        // check for bad tags
+        $badTags = array_fill_keys(explode(',',strtolower(XenForo_Application::getOptions()->SV_SVGAttachment_badTags)), true);
+        $badAttributes = array_fill_keys(explode(',',strtolower(XenForo_Application::getOptions()->SV_SVGAttachment_badAttributes)), true);
+
+        return $this->_scanSVG($svgfile, $badTags, $badAttributes);
+    }
+
+    protected function _scanSVG(SimpleXMLElement $node, array $badTags, array $badAttributes)
+    {
+        $attributes = $node->attributes();
+        foreach($attributes as $key => $val)
+        {
+            if (isset($badAttributes[strtolower($key)]))
+            {
+                return null;
+            }
+            $val = $this->_scanSVG($val, $badTags, $badAttributes);
+            if (empty($val))
+            {
+                return null;
+            }
+        }
+
+        $children = $node->children();
+        foreach($children as $key => $val)
+        {
+            if (isset($badTags[strtolower($key)]))
+            {
+                return null;
+            }
+            $val = $this->_scanSVG($val, $badTags, $badAttributes);
+            if (empty($val))
+            {
+                return null;
+            }
+        }
+        return $node;
     }
 
     public function getAttachmentThumbnailFilePath(array $data, $externalDataPath = null)
