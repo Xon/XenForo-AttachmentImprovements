@@ -4,6 +4,9 @@ A collection of improvements to XF's attachment system.
 
 - SVG support
 - nginx's X-Accel-Redirect
+- New Permissions for forum/conversations (Respects global attachment size & count limits):
+-- Attachment Size (kb).
+-- Maximum Attachment Count.
 
 # Implementation notes:
 

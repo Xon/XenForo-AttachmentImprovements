@@ -6,6 +6,7 @@ class SV_AttachmentImprovements_Globals
 {
     public static $tempThumbFile = null;
     public static $forcedDimensions = null;
+    public static $nodePermissionsForAttachments = null;
 
     private function __construct() {}
 }
