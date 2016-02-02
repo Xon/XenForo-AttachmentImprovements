@@ -1,8 +1,8 @@
 <?php
 
-class SV_SVGAttachment_Listener
+class SV_AttachmentImprovements_Listener
 {
-    const AddonNameSpace = 'SV_SVGAttachment_';
+    const AddonNameSpace = 'SV_AttachmentImprovements_';
 
     public static function load_class($class, array &$extend)
     {

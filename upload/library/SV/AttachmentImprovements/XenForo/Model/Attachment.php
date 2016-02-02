@@ -1,6 +1,6 @@
 <?php
 
-class SV_SVGAttachment_XenForo_Model_Attachment extends XFCP_SV_SVGAttachment_XenForo_Model_Attachment
+class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_AttachmentImprovements_XenForo_Model_Attachment
 {
     public function insertUploadedAttachmentData(XenForo_Upload $file, $userId, array $extra = array())
     {
@@ -36,9 +36,9 @@ class SV_SVGAttachment_XenForo_Model_Attachment extends XFCP_SV_SVGAttachment_Xe
                     $dimensions['thumbnail_height'] = ($attachmentThumbnailDimensions > $height)
                                                      ? $attachmentThumbnailDimensions
                                                      : $height;
-                    SV_SVGAttachment_Globals::$tempThumbFile = $tempThumbFile;
+                    SV_AttachmentImprovements_Globals::$tempThumbFile = $tempThumbFile;
                 }
-                SV_SVGAttachment_Globals::$forcedDimensions = $dimensions;
+                SV_AttachmentImprovements_Globals::$forcedDimensions = $dimensions;
             }
         }
 
@@ -68,8 +68,9 @@ class SV_SVGAttachment_XenForo_Model_Attachment extends XFCP_SV_SVGAttachment_Xe
             return null;
         }
         // check for bad tags
-        $badTags = array_fill_keys(explode(',',strtolower(XenForo_Application::getOptions()->SV_SVGAttachment_badTags)), true);
-        $badAttributes = array_fill_keys(explode(',',strtolower(XenForo_Application::getOptions()->SV_SVGAttachment_badAttributes)), true);
+        $options = XenForo_Application::getOptions();
+        $badTags = array_fill_keys(explode(',',strtolower($options->SV_AttachImpro_badTags)), true);
+        $badAttributes = array_fill_keys(explode(',',strtolower($options->SV_AttachmentImprovements_badAttributes)), true);
 
         return $this->_scanSVG($svgfile, $badTags, $badAttributes);
     }

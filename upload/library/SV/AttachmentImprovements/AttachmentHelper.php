@@ -1,6 +1,6 @@
 <?php
 
-class SV_XARAttachment_AttachmentHelper
+class SV_AttachmentImprovements_AttachmentHelper
 {
     public static function ConvertFilename(&$attachmentFile)
     {

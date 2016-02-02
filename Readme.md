@@ -25,7 +25,7 @@ This addon assumes the /internal_data folder exists within XenForo's webroot.
 
 If not, you may need an nginx config construct similar to:
 ```
-    location /internal_data {
+    location ^~ /internal_data {
         internal;
         add_header Etag $upstream_http_etag;
         add_header X-Frame-Options SAMEORIGIN;

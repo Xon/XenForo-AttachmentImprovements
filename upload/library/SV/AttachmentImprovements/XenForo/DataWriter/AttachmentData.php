@@ -1,15 +1,15 @@
 <?php
 
-class SV_SVGAttachment_XenForo_DataWriter_AttachmentData extends XFCP_SV_SVGAttachment_XenForo_DataWriter_AttachmentData
+class SV_AttachmentImprovements_XenForo_DataWriter_AttachmentData extends XFCP_SV_AttachmentImprovements_XenForo_DataWriter_AttachmentData
 {
     protected function _preSave()
     {
-        $dimensions = SV_SVGAttachment_Globals::$forcedDimensions;
+        $dimensions = SV_AttachmentImprovements_Globals::$forcedDimensions;
         if ($dimensions)
         {
             $this->set('width', $dimensions['width']);
             $this->set('height', $dimensions['height']);
-            $tempThumbFile = SV_SVGAttachment_Globals::$tempThumbFile;
+            $tempThumbFile = SV_AttachmentImprovements_Globals::$tempThumbFile;
             if ($tempThumbFile)
             {
                 $this->setExtraData(self::DATA_TEMP_THUMB_FILE, $tempThumbFile);
