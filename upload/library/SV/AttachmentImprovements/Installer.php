@@ -15,6 +15,17 @@ class SV_AttachmentImprovements_Installer
 
     public static function uninstall()
     {
+        $db = XenForo_Application::get('db');
+
+        $db->query("
+            DELETE FROM xf_permission_entry
+            WHERE permission_id in ('attach_count', 'attach_size')
+        ");
+        $db->query("
+            DELETE FROM xf_permission_entry_content
+            WHERE permission_id in ('attach_count', 'attach_size')
+        ");
+
         return true;
     }
 }
