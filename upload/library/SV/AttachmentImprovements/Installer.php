@@ -14,7 +14,7 @@ class SV_AttachmentImprovements_Installer
         }
         else if ($version == 0)
         {
-            $addon = $addonModel->getAddOnById('SV_SVGAttachment');
+            $addon = XenForo_Model::create('XenForo_Model_AddOn')->getAddOnById('SV_SVGAttachment');
             if (!empty($addon))
             {
                 XenForo_Application::defer(self::AddonNameSpace.'Deferred_SVGAttachmentThumb', array());
