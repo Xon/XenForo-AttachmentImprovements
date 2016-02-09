@@ -14,18 +14,17 @@ class SV_AttachmentImprovements_XenForo_ViewPublic_Attachment_View extends XFCP_
 
         $extension = XenForo_Helper_File::getFileExtension($attachment['filename']);
         $imageTypes = array(
-            'svg'  => array( 'mimeType' => 'image/svg+xml', 'requireThumbnail' => true),
-            'gif'  => array( 'mimeType' => 'image/gif',     'requireThumbnail' => false),
-            'jpg'  => array( 'mimeType' => 'image/jpeg',    'requireThumbnail' => false),
-            'jpeg' => array( 'mimeType' => 'image/jpeg',    'requireThumbnail' => false),
-            'jpe'  => array( 'mimeType' => 'image/jpeg',    'requireThumbnail' => false),
-            'png'  => array( 'mimeType' => 'image/png',     'requireThumbnail' => false)
+            'svg'  => 'image/svg+xml',
+            'gif'  => 'image/gif',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'jpe'  => 'image/jpeg',
+            'png'  => 'image/png'
         );
 
-        if (isset($imageTypes[$extension]) &&
-            (!$imageTypes[$extension]['requireThumbnail'] || $attachment['thumbnail_width'] && $attachment['thumbnail_height']))
+        if (isset($imageTypes[$extension]) && ($attachment['width'] && $attachment['height']))
         {
-            $this->_response->setHeader('Content-type', $imageTypes[$extension]['mimeType'], true);
+            $this->_response->setHeader('Content-type', $imageTypes[$extension], true);
             $this->setDownloadFileName($attachment['filename'], true);
         }
         else

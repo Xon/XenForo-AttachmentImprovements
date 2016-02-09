@@ -2,9 +2,24 @@
 
 class SV_AttachmentImprovements_Installer
 {
+    const AddonNameSpace = 'SV_AttachmentImprovements_';
+
     public static function install($existingAddOn, $addOnData)
     {
         $version = isset($existingAddOn['version_id']) ? $existingAddOn['version_id'] : 0;
+
+        if ($version && $version < 1000200)
+        {
+            XenForo_Application::defer(self::AddonNameSpace.'Deferred_SVGAttachmentThumb', array());
+        }
+        else if ($version == 0)
+        {
+            $addon = $addonModel->getAddOnById('SV_SVGAttachment');
+            if (!empty($addon))
+            {
+                XenForo_Application::defer(self::AddonNameSpace.'Deferred_SVGAttachmentThumb', array());
+            }
+        }
 
         $addonsToUninstall = array('SV_SVGAttachment' => array(),
                                    'SV_XARAttachment' => array());
