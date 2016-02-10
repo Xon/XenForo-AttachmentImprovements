@@ -8,7 +8,7 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         $extension = XenForo_Helper_File::getFileExtension($filename);
         if ($extension == 'svg')
         {
-            list($svgfile, $dimensions) = $this->extractDimensionsForSVG($file->getTempFile());
+            list($svgfile, $dimensions) = $this->extractDimensionsForSVG($file->getTempFile(), XenForo_Application::getOptions()->SV_RejectAttachmentWithBadTags);
             if (!empty($svgfile) && !empty($dimensions))
             {
                 if ($dimensions['thumbnail_width'] && $dimensions['thumbnail_height'])
@@ -31,24 +31,31 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         return parent::insertUploadedAttachmentData($file, $userId, $extra);
     }
 
-    public function extractDimensionsForSVG($filename)
+    protected function extractDimension($svgfile, $dimensionName)
+    {
+        $dimension = (string)$svgfile[$dimensionName];
+        if (strrpos($dimension , 'px') === strlen($dimension) - 2)
+        {
+            $dimension = substr($dimension, 0, -2);
+        }
+        return intval($dimension);
+    }
+
+    public function extractDimensionsForSVG($filename, $throwOnBadSVG = true)
     {
         $svgfile = $this->parseSVG($filename);
         if (empty($svgfile))
         {
+            if ($throwOnBadSVG)
+            {
+                throw new XenForo_Exception(new XenForo_Phrase('sv_bad_svg_data'), true);
+            }
             return array(null, null);
         }
 
-        $width = substr((string)$svgfile['width'], 0, -2);
-        $height = substr((string)$svgfile['height'], 0, -2);
-        if (empty($width) || !is_numeric($width))
-        {
-            $width = 0;
-        }
-        if (empty($height) || !is_numeric($height))
-        {
-            $height = 0;
-        }
+        $width = $this->extractDimension($svgfile, 'width');
+        $height = $this->extractDimension($svgfile, 'height');
+
         $dimensions = array(
             'width' => $width,
             'height' => $height,
@@ -90,7 +97,8 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         }
         catch(Exception $e)
         {
-            $svgfile= null;
+            XenForo_Error::logException($e, false);
+            $svgfile = null;
         }
         if (empty($svgfile))
         {

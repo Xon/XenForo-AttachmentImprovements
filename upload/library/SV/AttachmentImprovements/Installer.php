@@ -8,7 +8,7 @@ class SV_AttachmentImprovements_Installer
     {
         $version = isset($existingAddOn['version_id']) ? $existingAddOn['version_id'] : 0;
 
-        if ($version && $version < 1000200)
+        if ($version && $version < 1000300)
         {
             XenForo_Application::defer(self::AddonNameSpace.'Deferred_SVGAttachmentThumb', array());
         }
