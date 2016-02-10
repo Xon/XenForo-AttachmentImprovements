@@ -10,6 +10,19 @@ class SV_AttachmentImprovements_Installer
 
         if ($version && $version < 1000300)
         {
+            // migrate to remove the 'use' from the bad tag list
+            $tags = XenForo_Application::getOption()->SV_AttachImpro_badTags;
+            $tags = explode(',', $tags);
+            if(($key = array_search('user', $tags)) !== false)
+            {
+                unset($tags[$key]);
+            }
+            $dw = XenForo_DataWriter::create('XenForo_DataWriter_Option', XenForo_DataWriter::ERROR_SILENT);
+            $dw->setExistingData('SV_AttachImpro_badTags');
+            $dw->setOption(XenForo_DataWriter_Option::OPTION_REBUILD_CACHE, false);
+            $dw->set('option_value', implode(',', $tags));
+            $dw->save();
+
             XenForo_Application::defer(self::AddonNameSpace.'Deferred_SVGAttachmentThumb', array());
         }
         else if ($version == 0)
