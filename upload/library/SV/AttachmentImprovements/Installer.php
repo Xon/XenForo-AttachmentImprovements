@@ -11,9 +11,9 @@ class SV_AttachmentImprovements_Installer
         if ($version && $version < 1000300)
         {
             // migrate to remove the 'use' from the bad tag list
-            $tags = XenForo_Application::getOption()->SV_AttachImpro_badTags;
+            $tags = XenForo_Application::getOptions()->SV_AttachImpro_badTags;
             $tags = explode(',', $tags);
-            if(($key = array_search('user', $tags)) !== false)
+            if(($key = array_search('use', $tags)) !== false)
             {
                 unset($tags[$key]);
             }
