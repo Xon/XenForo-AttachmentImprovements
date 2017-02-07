@@ -38,7 +38,7 @@ If not, you may need an nginx config construct similar to:
 ```  
 And then add in config.php
 ```
-    config['internalDataUrl'] = '/internal_data';
+    $config['internalDataUrl'] = '/internal_data';
 ```  
 
 To ensure you match how XenForo serves files, add the following headers into your site config where appropriate:
