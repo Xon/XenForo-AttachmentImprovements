@@ -63,7 +63,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
             'attachmentConstraints' => $constraints,
             'existingAttachments' => $existingAttachments,
             'newAttachments' => $newAttachments,
-            'recentAttchments' => $attachmentModel->getRecentAttachments(),
+            'recentAttchments' => $attachmentModel->getRecentAttachments($input),
 
             'canUpload' => $canUpload,
             'remainingUploads' => $remainingUploads,

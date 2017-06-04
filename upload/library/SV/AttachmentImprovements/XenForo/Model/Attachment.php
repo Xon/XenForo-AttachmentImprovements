@@ -183,9 +183,14 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         return $url;
     }
 
-    public function getRecentAttachments($limit = 5, array $viewingUser = null)
+    public function getRecentAttachments($input, $limit = 5, array $viewingUser = null)
     {
         $this->standardizeViewingUserReference($viewingUser);
+
+        $contentType = $input['content_type'];
+        $attachmentHandler = $this->getAttachmentHandler($contentType); // known to be valid
+        $contentId = $attachmentHandler->getContentIdFromContentData($input['content_data']);
+
         // xf_attachment_data - attachment data
         // xf_attachment - link between attachment data & content
         return $this->fetchAllKeyed($db->limit('
@@ -194,13 +199,9 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 			FROM xf_attachment AS attachment
 			INNER JOIN xf_attachment_data AS data ON
 				(data.data_id = attachment.data_id)
-            WHERE data_id in (
-                SELECT data_id
-                FROM xf_attachment_data
-                WHERE user_id = ?
-                ORDER BY upload_date desc)
+            WHERE attachment.content_type <> ? and attachment.content_id <> ? and data.user_id = ?
             ORDER BY attachment.attach_date
-        ', $limit), 'attachment_id', array($user['user_id']));
+        ', $limit), 'attachment_id', array($contentType, $contentId, $viewingUser['user_id']));
     }
 
     private function _replaceExtenstion($path, $ext)

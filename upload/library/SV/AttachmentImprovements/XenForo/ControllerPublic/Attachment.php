@@ -18,7 +18,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Attachment extends XFCP
         $params = parent::_getAttachmentData($input);
         if (!empty($params['canUpload']))
         {
-            $params['recentAttchments'] = $attachmentModel->getRecentAttachments();
+            $params['recentAttchments'] = $attachmentModel->getRecentAttachments($input);
         }
         return $params;
     }
