@@ -223,6 +223,9 @@ $0]]></replace>
             }, 100);
             
             $('#redactor_modal_inner').xfActivate();
+            $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {
+                // upload complete, see; e.$form & e.ajaxData
+            });
 
         }, ed));
     };
