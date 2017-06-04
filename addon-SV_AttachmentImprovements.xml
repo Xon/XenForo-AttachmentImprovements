@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="SV_AttachmentImprovements" title="Attachment Improvements" version_string="1.0.3" version_id="1000302" url="https://xenforo.com/community/resources/attachment-improvements-by-xon.5042/" install_callback_class="SV_AttachmentImprovements_Installer" install_callback_method="install" uninstall_callback_class="SV_AttachmentImprovements_Installer" uninstall_callback_method="uninstall">
+<addon addon_id="SV_AttachmentImprovements" title="Attachment Improvements" version_string="1.1.0" version_id="1010000" url="https://xenforo.com/community/resources/attachment-improvements-by-xon.5042/" install_callback_class="SV_AttachmentImprovements_Installer" install_callback_method="install" uninstall_callback_class="SV_AttachmentImprovements_Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -55,6 +55,16 @@
       <sub_options></sub_options>
       <relation group_id="attachments" display_order="1200"/>
     </option>
+    <option option_id="attachmentImageExtensions" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value>png
+jpg
+jpeg
+jpe
+gif</default_value>
+      <edit_format_params>rows=6</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="attachments" display_order="25"/>
+    </option>
   </optiongroups>
   <permissions>
     <permission_groups/>
@@ -67,6 +77,9 @@
     <interface_groups/>
   </permissions>
   <phrases>
+    <phrase title="option_attachmentImageExtensions" version_id="1000302" version_string="1.0.3"><![CDATA[Allowed Image Attachment File Extensions]]></phrase>
+    <phrase title="option_attachmentImageExtensions_explain" version_id="1000302" version_string="1.0.3"><![CDATA[When attaching images, the list of file extensions allowed. Use spaces or line break between extensions.<br/>
+<b>Must</b> be a subset of the full list]]></phrase>
     <phrase title="option_group_SV_AttachImpro_Debug" version_id="1000000" version_string="1.0.0"><![CDATA[Nginx X-Accel-Redirect Debug Options]]></phrase>
     <phrase title="option_group_SV_AttachImpro_Debug_description" version_id="1000000" version_string="1.0.0"><![CDATA[]]></phrase>
     <phrase title="option_SV_AttachImpro_badAttributes" version_id="1000000" version_string="1.0.0"><![CDATA[SVG Bad Attributes]]></phrase>
@@ -112,59 +125,31 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
   <route_prefixes/>
   <style_properties/>
   <templates>
-    <template title="editor_dialog_image_improvements" version_id="1000302" version_string="1.0.3"><![CDATA[<form action="{xen:link 'attachments/do-upload'}" method="post" enctype="multipart/form-data" class="xenForm">
+    <template title="editor_dialog_image_improvements" version_id="1010000" version_string="1.1.0"><![CDATA[<form action="{xen:link 'attachments/do-upload'}" method="post" enctype="multipart/form-data" class="AutoInlineUploader AttachmentUploadForm xenForm">
 	
-	<xen:if is="{$canUpload}">
-		<dl class="ctrlUnit">
-			<dt><label>{xen:phrase upload_attachments}:</label></dt>
-			<dd><input type="file" name="upload" /></dd>
-		</dl>
-	</xen:if>
-		
-	<xen:if is="{$newAttachments}">
-		<dl class="ctrlUnit">
-			<dt><label>{xen:phrase new_attachments}:</label></dt>
-			<dd>
-				<ul>
-				<xen:foreach loop="$newAttachments" value="$attachment">
-					<li>
-						<a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
-						<input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
-					</li>
-				</xen:foreach>
-				</ul>
-			</dd>
-		</dl>
-	</xen:if>
-
-	<xen:if is="{$existingAttachments}">
-		<dl class="ctrlUnit">
-			<dt><label>{xen:phrase existing_attachments}:</label></dt>
-			<dd>
-				<ul>
-				<xen:foreach loop="$existingAttachments" value="$attachment">
-					<li>
-						<a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
-						<input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
-					</li>
-				</xen:foreach>
-				</ul>
-			</dd>
-		</dl>
-	</xen:if>
-
-	<dl class="ctrlUnit submitUnit">
-		<dt></dt>
-		<dd><input type="submit" value="{xen:phrase upload_attachments}" accesskey="s" class="button primary" /></dd>
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_upload">{xen:phrase upload_file} (<span title="{xen:phrase x_bytes, 'size={xen:number $attachmentConstraints.size}'}">{xen:phrase max_x, "size={xen:number $attachmentConstraints.size, 'size'}"}</span>):</label></dt>
+		<dd id="SWFUploadContainer" data-placeholder="#SWFUploadPlaceHolder" data-trigger="#ctrl_upload">
+			<span id="SWFUploadPlaceHolder"></span>
+			<input type="file" name="upload" class="textCtrl" onchange="this.blur()" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
+		</dd>
 	</dl>
+	
+	<div class="attachmentConstraints pairsRows">
+		<dl><dt>{xen:phrase accepted_file_types}:</dt> <dd>{xen:helper implode, $attachmentConstraints.extensions, ', '}</dd></dl>
+		<xen:if is="{$attachmentConstraints.width}">
+			<dl><dt>{xen:phrase max_image_width}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.width}'}</dd></dl>
+		</xen:if>
+		<xen:if is="{$attachmentConstraints.height}">
+			<dl><dt>{xen:phrase max_image_height}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.height}'}</dd></dl>
+		</xen:if>
+	</div>
 
 	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
-	<input type="hidden" name="hash" value="{$hash}" />
-	<input type="hidden" name="content_type" value="{$contentType}" />
+	<input type="hidden" name="hash" value="{$attachmentParams.hash}" />
+	<input type="hidden" name="content_type" value="{$attachmentParams.content_type}" />
 	<input type="hidden" name="key" value="{$key}" />
-	
-	<xen:foreach loop="$contentData" key="$dataKey" value="$dataValue">
-		<input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
+	<xen:foreach loop="$attachmentParams.content_data" key="$dataKey" value="$dataValue"><input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
 	</xen:foreach>
 </form>]]></template>
   </templates>
@@ -185,20 +170,61 @@ $0]]></replace>
 {
     var xf_getImageModal = XenForo.BbCodeWysiwygEditor.prototype.getImageModal;
     XenForo.BbCodeWysiwygEditor.prototype.getImageModal = function(ed) {
-        originalUrl = this.dialogUrl;
+        var dialogUrl = this.dialogUrl;
         var href = $("input#ctrl_uploader").data("href");
         if (href && this.dialogUrl) {
             var i = href.indexOf('?');
-            this.dialogUrl = this.dialogUrl + "&" + href.substring(i + 1);
+            dialogUrl = dialogUrl + "&" + href.substring(i + 1);
         }
-        try
+        var self = this;
+
+        ed.saveSelection();
+
+        var selHtml = ed.getSelectedHtml(), defaultVal;
+        if (selHtml.match(/^\s*<img[^>]+src="([^"]+)"[^>]*>\s*$/) && !selHtml.match(/mceSmilie|attachFull|attachThumb/))
         {
-            return xf_getImageModal.apply(this, arguments);
+            defaultVal = RegExp.\$1; // this assignment is needed because jQuery uses a regex
+            defaultVal = $('<textarea>').html(defaultVal).text();
         }
-        finally
+
+        ed.modalInit(this.getText('image'), { url: dialogUrl + '&dialog=image' }, 600, $.proxy(function()
         {
-            this.dialogUrl = originalUrl;
-        }
+            var $input = $('#redactor_image_link');
+
+            $('#redactor_image_btn').click(function(e) {
+                e.preventDefault();
+
+                ed.restoreSelection();
+
+                var val = $input.val();
+                if (val !== '')
+                {
+                    if (!val.match(/^https?:|ftp:/i))
+                    {
+                        val = 'http://' + val;
+                    }
+
+                    ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
+                }
+
+                ed.modalClose();
+                ed.observeImages();
+                ed.syncCode();
+                ed.focus();
+            });
+
+            if (defaultVal)
+            {
+                $input.val(defaultVal);
+            }
+
+            setTimeout(function() {
+                $input.focus();
+            }, 100);
+            
+            $('#redactor_modal_inner').xfActivate();
+
+        }, ed));
     };
 }
 (jQuery, this, document);

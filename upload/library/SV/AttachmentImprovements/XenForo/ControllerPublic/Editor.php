@@ -20,7 +20,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
 
             $attachmentData = $this->_getAttachmentData($input);
             $response->params = array_merge($response->params, $attachmentData);
-            // $response->params["attachmentParams"] = $attachmentData;
+            $response->params['attachmentConstraints']['extensions'] = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
         }
 
         return $response;
