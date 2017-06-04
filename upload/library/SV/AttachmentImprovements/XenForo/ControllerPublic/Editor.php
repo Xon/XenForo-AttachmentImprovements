@@ -42,10 +42,11 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         $attachmentHandler = $attachmentModel->getAttachmentHandler($input['content_type']); // known to be valid
         $contentId = $attachmentHandler->getContentIdFromContentData($input['content_data']);
 
-        $existingAttachments = ($contentId
-            ? $attachmentModel->getAttachmentsByContentId($input['content_type'], $contentId)
-            : array()
-        );
+        // $existingAttachments = ($contentId
+        //     ? $attachmentModel->getAttachmentsByContentId($input['content_type'], $contentId)
+        //     : array()
+        // );
+        $existingAttachments = $attachmentModel->getRecentAttachments($input);
         $newAttachments = $attachmentModel->getAttachmentsByTempHash($input['hash']);
 
         $constraints = $attachmentHandler->getAttachmentConstraints();

@@ -199,9 +199,9 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 			FROM xf_attachment AS attachment
 			INNER JOIN xf_attachment_data AS data ON
 				(data.data_id = attachment.data_id)
-            WHERE attachment.content_type <> ? and attachment.content_id <> ? and data.user_id = ?
-            ORDER BY attachment.attach_date
-        ', $limit), 'attachment_id', array($contentType, $contentId, $viewingUser['user_id']));
+            WHERE attachment.content_id <> ? and data.user_id = ?
+            ORDER BY attachment.attach_date DESC
+        ', $limit), 'attachment_id', array($contentId, $viewingUser['user_id']));
     }
 
     private function _replaceExtenstion($path, $ext)
