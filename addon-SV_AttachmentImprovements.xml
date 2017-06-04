@@ -209,7 +209,24 @@ $0]]></replace>
 
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
-                console.log(e.target);
+
+                ed.restoreSelection();
+
+                var val = $input.val();
+                if (val !== '')
+                {
+                    if (!val.match(/^https?:|ftp:/i))
+                    {
+                        val = 'http://' + val;
+                    }
+
+                    ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
+                }
+
+                ed.modalClose();
+                ed.observeImages();
+                ed.syncCode();
+                ed.focus();
             });
 
             if (defaultVal)
