@@ -112,20 +112,75 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
   <route_prefixes/>
   <style_properties/>
   <templates>
-    <template title="editor_dialog_image_improvements" version_id="1000302" version_string="1.0.3"><![CDATA[<dt>Test:</dt>
-<dd>Also test</dd>
-]]></template>
+    <template title="editor_dialog_image_improvements" version_id="1000302" version_string="1.0.3"><![CDATA[<form action="{xen:link 'attachments/do-upload'}" method="post" enctype="multipart/form-data" class="xenForm">
+	
+	<xen:if is="{$canUpload}">
+		<dl class="ctrlUnit">
+			<dt><label>{xen:phrase upload_attachments}:</label></dt>
+			<dd><input type="file" name="upload" /></dd>
+		</dl>
+	</xen:if>
+		
+	<xen:if is="{$newAttachments}">
+		<dl class="ctrlUnit">
+			<dt><label>{xen:phrase new_attachments}:</label></dt>
+			<dd>
+				<ul>
+				<xen:foreach loop="$newAttachments" value="$attachment">
+					<li>
+						<a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
+						<input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
+					</li>
+				</xen:foreach>
+				</ul>
+			</dd>
+		</dl>
+	</xen:if>
+
+	<xen:if is="{$existingAttachments}">
+		<dl class="ctrlUnit">
+			<dt><label>{xen:phrase existing_attachments}:</label></dt>
+			<dd>
+				<ul>
+				<xen:foreach loop="$existingAttachments" value="$attachment">
+					<li>
+						<a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
+						<input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
+					</li>
+				</xen:foreach>
+				</ul>
+			</dd>
+		</dl>
+	</xen:if>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:phrase upload_attachments}" accesskey="s" class="button primary" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+	<input type="hidden" name="hash" value="{$hash}" />
+	<input type="hidden" name="content_type" value="{$contentType}" />
+	<input type="hidden" name="key" value="{$key}" />
+	
+	<xen:foreach loop="$contentData" key="$dataKey" value="$dataValue">
+		<input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
+	</xen:foreach>
+</form>]]></template>
   </templates>
   <public_template_modifications>
     <modification template="editor_dialog_image" modification_key="editor_dialog_image" description="Adds new options to image uploading form" execution_order="10" enabled="1" action="str_replace">
       <find><![CDATA[<dl class="ctrlUnit">]]></find>
-      <replace><![CDATA[$0
-<xen:include template="editor_dialog_image_improvements" />]]></replace>
+      <replace><![CDATA[<xen:include template="editor_dialog_image_improvements" />
+$0]]></replace>
     </modification>
     <modification template="editor_js_setup" modification_key="editor_js_setup" description="Adds additional data to image dialog request" execution_order="10" enabled="1" action="preg_replace">
       <find><![CDATA[#$#]]></find>
       <replace><![CDATA[$0
-<script>/** @param {jQuery} $ jQuery Object */
+<script>
+<xen:comment><xen:require js="js/SV/AttachmentImprovements/ImageDialog.js" /></xen:comment>
+
+/** @param {jQuery} $ jQuery Object */
 !function($, window, document, _undefined)
 {
     var xf_getImageModal = XenForo.BbCodeWysiwygEditor.prototype.getImageModal;
@@ -135,7 +190,6 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
         if (href && this.dialogUrl) {
             var i = href.indexOf('?');
             this.dialogUrl = this.dialogUrl + "&" + href.substring(i + 1);
-            console.log(this.dialogUrl);
         }
         try
         {
