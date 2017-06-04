@@ -193,7 +193,7 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 
         // xf_attachment_data - attachment data
         // xf_attachment - link between attachment data & content
-        return $this->fetchAllKeyed($db->limit('
+        return $this->fetchAllKeyed($this->_getDb()->limit('
 			SELECT attachment.*,
 				' . self::$dataColumns . '
 			FROM xf_attachment AS attachment
