@@ -151,6 +151,22 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
 	<input type="hidden" name="key" value="{$key}" />
 	<xen:foreach loop="$attachmentParams.content_data" key="$dataKey" value="$dataValue"><input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
 	</xen:foreach>
+
+    <xen:if is="{$existingAttachments}">
+        <dl class="ctrlUnit">
+            <dt><label>{xen:phrase existing_attachments}:</label></dt>
+            <dd>
+                <ul>
+                <xen:foreach loop="$existingAttachments" value="$attachment">
+                    <li>
+                        <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
+                        <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
+                    </li>
+                </xen:foreach>
+                </ul>
+            </dd>
+        </dl>
+    </xen:if>
 </form>]]></template>
   </templates>
   <public_template_modifications>
@@ -193,24 +209,7 @@ $0]]></replace>
 
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
-
-                ed.restoreSelection();
-
-                var val = $input.val();
-                if (val !== '')
-                {
-                    if (!val.match(/^https?:|ftp:/i))
-                    {
-                        val = 'http://' + val;
-                    }
-
-                    ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
-                }
-
-                ed.modalClose();
-                ed.observeImages();
-                ed.syncCode();
-                ed.focus();
+                console.log(e.target);
             });
 
             if (defaultVal)
@@ -225,6 +224,7 @@ $0]]></replace>
             $('#redactor_modal_inner').xfActivate();
             $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {
                 // upload complete, see; e.$form & e.ajaxData
+                console.log("boop");
             });
 
         }, ed));
