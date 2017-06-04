@@ -7,6 +7,9 @@
   <admin_template_modifications/>
   <code_events/>
   <code_event_listeners>
+    <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Attachment" description="XenForo_ControllerPublic_Attachment"/>
+    <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerAdmin_Attachment" description="XenForo_ControllerAdmin_Attachment"/>
+    <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Editor" description="XenForo_ControllerPublic_Editor"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ViewAdmin_Attachment_View" description="XenForo_ViewAdmin_Attachment_View"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ViewPublic_Attachment_View" description="XenForo_ViewPublic_Attachment_View"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_Model_Attachment" description="XenForo_Model_Attachment"/>
@@ -15,8 +18,6 @@
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_AttachmentHandler_Post" description="XenForo_AttachmentHandler_Post"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_Model_Forum" description="XenForo_Model_Forum"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerAdmin_Tools" description="XenForo_ControllerAdmin_Tools"/>
-    <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Attachment" description="XenForo_ControllerPublic_Attachment"/>
-    <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerAdmin_Attachment" description="XenForo_ControllerAdmin_Attachment"/>
   </code_event_listeners>
   <cron/>
   <email_templates/>
@@ -110,8 +111,46 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
   </phrases>
   <route_prefixes/>
   <style_properties/>
-  <templates/>
-  <public_template_modifications/>
+  <templates>
+    <template title="editor_dialog_image_improvements" version_id="1000302" version_string="1.0.3"><![CDATA[<dt>Test:</dt>
+<dd>Also test</dd>
+]]></template>
+  </templates>
+  <public_template_modifications>
+    <modification template="editor_dialog_image" modification_key="editor_dialog_image" description="Adds new options to image uploading form" execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<dl class="ctrlUnit">]]></find>
+      <replace><![CDATA[$0
+<xen:include template="editor_dialog_image_improvements" />]]></replace>
+    </modification>
+    <modification template="editor_js_setup" modification_key="editor_js_setup" description="Adds additional data to image dialog request" execution_order="10" enabled="1" action="preg_replace">
+      <find><![CDATA[#$#]]></find>
+      <replace><![CDATA[$0
+<script>/** @param {jQuery} $ jQuery Object */
+!function($, window, document, _undefined)
+{
+    var xf_getImageModal = XenForo.BbCodeWysiwygEditor.prototype.getImageModal;
+    XenForo.BbCodeWysiwygEditor.prototype.getImageModal = function(ed) {
+        originalUrl = this.dialogUrl;
+        var href = $("input#ctrl_uploader").data("href");
+        if (href && this.dialogUrl) {
+            var i = href.indexOf('?');
+            this.dialogUrl = this.dialogUrl + "&" + href.substring(i + 1);
+            console.log(this.dialogUrl);
+        }
+        try
+        {
+            return xf_getImageModal.apply(this, arguments);
+        }
+        finally
+        {
+            this.dialogUrl = originalUrl;
+        }
+    };
+}
+(jQuery, this, document);
+</script>]]></replace>
+    </modification>
+  </public_template_modifications>
   <bb_code_media_sites/>
   <bb_codes/>
 </addon>

@@ -183,6 +183,13 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         return $url;
     }
 
+
+    public function getRecentAttachments(array $user)
+    {
+
+    }
+
+
     private function _replaceExtenstion($path, $ext)
     {
         $pos = strrpos($path , '.');

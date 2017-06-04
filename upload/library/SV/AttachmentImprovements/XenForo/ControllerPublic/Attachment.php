@@ -12,4 +12,9 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Attachment extends XFCP
 
         return parent::actionIndex();
     }
+
+    public function actionGetRecentAttachments()
+    {
+
+    }
 }
