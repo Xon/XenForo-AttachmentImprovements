@@ -10,7 +10,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
 
         if ($dialog == "image")
         {
-            $attachmentParams = $this->_input->filter(array(
+            $input = $this->_input->filter(array(
                 'hash' => XenForo_Input::STRING,
                 'content_type' => XenForo_Input::STRING,
                 'content_data' => array(XenForo_Input::UINT, 'array' => true),
@@ -18,8 +18,9 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
             ));
             // Assumption: Always has hash as opposed to temp_hash
 
-            $attachmentData = $this->_getAttachmentData($attachmentParams);
+            $attachmentData = $this->_getAttachmentData($input);
             $response->params = array_merge($response->params, $attachmentData);
+            // $response->params["attachmentParams"] = $attachmentData;
         }
 
         return $response;
@@ -63,7 +64,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
             'attachmentConstraints' => $constraints,
             'existingAttachments' => $existingAttachments,
             'newAttachments' => $newAttachments,
-            'recentAttchments' => $attachmentModel->getRecentAttachments($input),
+            'recentAttachments' => $attachmentModel->getRecentAttachments($input),
 
             'canUpload' => $canUpload,
             'remainingUploads' => $remainingUploads,
