@@ -1,22 +1,23 @@
 /** @param {jQuery} $ jQuery Object */
 !function($, window, document, _undefined)
 {
-    var xf_getImageModal = XenForo.BbCodeWysiwygEditor.prototype.getImageModal;
-    XenForo.BbCodeWysiwygEditor.prototype.getImageModal = function(ed) {
-        originalUrl = this.dialogUrl;
-        var href = $("input#ctrl_uploader").data("href");
-        if (href && this.dialogUrl) {
-            var i = href.indexOf('?');
-            this.dialogUrl = this.dialogUrl + "&" + href.substring(i + 1);
-        }
-        try
-        {
-            return xf_getImageModal.apply(this, arguments);
-        }
-        finally
-        {
-            this.dialogUrl = originalUrl;
+    $.fn.bindFirst = function(name, fn) {
+        var elem, handlers, i, _len;
+        this.bind(name, fn);
+        for (i = 0, _len = this.length; i < _len; i++) {
+            elem = this[i];
+            handlers = jQuery._data(elem).events[name.split('.')[0]];
+            handlers.unshift(handlers.pop());
         }
     };
+
+    // Add pre-commands
+    document.uploadFlag = false;
+    $("input[type='file']").bindFirst("change",
+        function(e){
+            document.uploadFlag = true;
+            console.log("first!");
+        }
+    );
 }
 (jQuery, this, document);

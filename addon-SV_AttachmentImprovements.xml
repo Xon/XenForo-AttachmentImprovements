@@ -167,7 +167,32 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
             </dd>
         </dl>
     </xen:if>
-</form>]]></template>
+</form>
+<script>
+/** @param {jQuery} $ jQuery Object */
+!function($, window, document, _undefined)
+{
+    $.fn.bindFirst = function(name, fn) {
+        var elem, handlers, i, _len;
+        this.bind(name, fn);
+        for (i = 0, _len = this.length; i < _len; i++) {
+            elem = this[i];
+            handlers = jQuery._data(elem).events[name.split('.')[0]];
+            handlers.unshift(handlers.pop());
+        }
+    };
+
+    // Add pre-commands
+    document.uploadFlag = false;
+    $("input[type='file']").bindFirst("change",
+        function(e){
+            document.uploadFlag = true;
+            console.log("first!");
+        }
+    );
+}
+(jQuery, this, document);
+</script>]]></template>
   </templates>
   <public_template_modifications>
     <modification template="editor_dialog_image" modification_key="editor_dialog_image" description="Adds new options to image uploading form" execution_order="10" enabled="1" action="str_replace">
@@ -179,7 +204,7 @@ $0]]></replace>
       <find><![CDATA[#$#]]></find>
       <replace><![CDATA[$0
 <script>
-<xen:comment><xen:require js="js/SV/AttachmentImprovements/ImageDialog.js" /></xen:comment>
+<xen:comment><xen:require js="js/SV/AttachmentImprovements/attachmentImprovements.js" /></xen:comment>
 
 /** @param {jQuery} $ jQuery Object */
 !function($, window, document, _undefined)
@@ -209,24 +234,26 @@ $0]]></replace>
 
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
+console.log("boop");
+console.log(document.uploadFlag);
 
-                ed.restoreSelection();
+                // ed.restoreSelection();
 
-                var val = $input.val();
-                if (val !== '')
-                {
-                    if (!val.match(/^https?:|ftp:/i))
-                    {
-                        val = 'http://' + val;
-                    }
+                // var val = $input.val();
+                // if (val !== '')
+                // {
+                //    if (!val.match(/^https?:|ftp:/i))
+                //    {
+                //        val = 'http://' + val;
+                //    }
 
-                    ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
-                }
+                //    ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
+                // }
 
-                ed.modalClose();
-                ed.observeImages();
-                ed.syncCode();
-                ed.focus();
+                // ed.modalClose();
+                // ed.observeImages();
+                // ed.syncCode();
+                // ed.focus();
             });
 
             if (defaultVal)
@@ -239,6 +266,7 @@ $0]]></replace>
             }, 100);
             
             $('#redactor_modal_inner').xfActivate();
+
             $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {
                 // upload complete, see; e.$form & e.ajaxData
                 console.log("boop");
