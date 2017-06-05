@@ -125,74 +125,51 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
   <route_prefixes/>
   <style_properties/>
   <templates>
-    <template title="editor_dialog_image_improvements" version_id="1010000" version_string="1.1.0"><![CDATA[<form action="{xen:link 'attachments/do-upload'}" method="post" enctype="multipart/form-data" class="AutoInlineUploader AttachmentUploadForm xenForm">
-	
-	<dl class="ctrlUnit">
-		<dt><label for="ctrl_upload">{xen:phrase upload_file} (<span title="{xen:phrase x_bytes, 'size={xen:number $attachmentConstraints.size}'}">{xen:phrase max_x, "size={xen:number $attachmentConstraints.size, 'size'}"}</span>):</label></dt>
-		<dd id="SWFUploadContainer" data-placeholder="#SWFUploadPlaceHolder" data-trigger="#ctrl_upload">
-			<span id="SWFUploadPlaceHolder"></span>
-			<input type="file" name="upload" class="textCtrl" onchange="this.blur()" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
-		</dd>
-	</dl>
-	
-	<div class="attachmentConstraints pairsRows">
-		<dl><dt>{xen:phrase accepted_file_types}:</dt> <dd>{xen:helper implode, $attachmentConstraints.extensions, ', '}</dd></dl>
-		<xen:if is="{$attachmentConstraints.width}">
-			<dl><dt>{xen:phrase max_image_width}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.width}'}</dd></dl>
-		</xen:if>
-		<xen:if is="{$attachmentConstraints.height}">
-			<dl><dt>{xen:phrase max_image_height}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.height}'}</dd></dl>
-		</xen:if>
-	</div>
+    <template title="editor_dialog_image_improvements" version_id="1010000" version_string="1.1.0"><![CDATA[<dl class="ctrlUnit">
+    <dt><label for="ctrl_upload">{xen:phrase upload_file} (<span title="{xen:phrase x_bytes, 'size={xen:number $attachmentConstraints.size}'}">{xen:phrase max_x, "size={xen:number $attachmentConstraints.size, 'size'}"}</span>):</label></dt>
+    <dd id="SWFUploadContainer" data-placeholder="#SWFUploadPlaceHolder" data-trigger="#ctrl_upload">
+        <span id="SWFUploadPlaceHolder"></span>
+        <input type="file" name="upload" class="textCtrl uploadFileInputOutside" onchange="this.blur()" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
+    </dd>
+</dl>
 
-	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
-	<input type="hidden" name="hash" value="{$attachmentParams.hash}" />
-	<input type="hidden" name="content_type" value="{$attachmentParams.content_type}" />
-	<input type="hidden" name="key" value="{$key}" />
-	<xen:foreach loop="$attachmentParams.content_data" key="$dataKey" value="$dataValue"><input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
-	</xen:foreach>
-
-    <xen:if is="{$existingAttachments}">
-        <dl class="ctrlUnit">
-            <dt><label>{xen:phrase existing_attachments}:</label></dt>
-            <dd>
-                <ul>
-                <xen:foreach loop="$existingAttachments" value="$attachment">
-                    <li>
-                        <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
-                        <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
-                    </li>
-                </xen:foreach>
-                </ul>
-            </dd>
-        </dl>
+<div class="attachmentConstraints pairsRows">
+    <dl><dt>{xen:phrase accepted_file_types}:</dt> <dd>{xen:helper implode, $attachmentConstraints.extensions, ', '}</dd></dl>
+    <xen:if is="{$attachmentConstraints.width}">
+        <dl><dt>{xen:phrase max_image_width}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.width}'}</dd></dl>
     </xen:if>
-</form>
-<script>
-/** @param {jQuery} $ jQuery Object */
-!function($, window, document, _undefined)
-{
-    $.fn.bindFirst = function(name, fn) {
-        var elem, handlers, i, _len;
-        this.bind(name, fn);
-        for (i = 0, _len = this.length; i < _len; i++) {
-            elem = this[i];
-            handlers = jQuery._data(elem).events[name.split('.')[0]];
-            handlers.unshift(handlers.pop());
-        }
-    };
+    <xen:if is="{$attachmentConstraints.height}">
+        <dl><dt>{xen:phrase max_image_height}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.height}'}</dd></dl>
+    </xen:if>
+</div>
 
-    // Add pre-commands
-    document.uploadFlag = false;
-    $("input[type='file']").bindFirst("change",
-        function(e){
-            document.uploadFlag = true;
-            console.log("first!");
-        }
-    );
-}
-(jQuery, this, document);
-</script>]]></template>
+<xen:if is="{$existingAttachments}">
+    <dl class="ctrlUnit">
+        <dt><label>{xen:phrase existing_attachments}:</label></dt>
+        <dd>
+            <ul>
+            <xen:foreach loop="$existingAttachments" value="$attachment">
+                <li>
+                    <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
+                    <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
+                </li>
+            </xen:foreach>
+            </ul>
+        </dd>
+    </dl>
+</xen:if>
+
+<form action="{xen:link 'attachments/do-upload'}" method="post" id="hiddenAttachmentForm" style="display:none" enctype="multipart/form-data" class="AutoInlineUploader AttachmentUploadForm xenForm">
+    <input type="file" name="upload" class="textCtrl" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
+
+    <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+    <input type="hidden" name="hash" value="{$attachmentParams.hash}" />
+    <input type="hidden" name="content_type" value="{$attachmentParams.content_type}" />
+    <input type="hidden" name="key" value="{$key}" />
+    <xen:foreach loop="$attachmentParams.content_data" key="$dataKey" value="$dataValue">
+        <input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
+    </xen:foreach>
+</form>]]></template>
   </templates>
   <public_template_modifications>
     <modification template="editor_dialog_image" modification_key="editor_dialog_image" description="Adds new options to image uploading form" execution_order="10" enabled="1" action="str_replace">
@@ -234,8 +211,10 @@ $0]]></replace>
 
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
+
 console.log("boop");
-console.log(document.uploadFlag);
+console.log($(document.uploadTarget).closest("form"));
+document.uploadTarget = null;
 
                 // ed.restoreSelection();
 
@@ -264,8 +243,38 @@ console.log(document.uploadFlag);
             setTimeout(function() {
                 $input.focus();
             }, 100);
-            
-            $('#redactor_modal_inner').xfActivate();
+
+            // Move the upload form out
+            var h = $("form#hiddenAttachmentForm");
+            h.insertAfter(h.parent().closest("form.xenForm"));
+
+            // Activate stuff
+            $('form#hiddenAttachmentForm').parent().xfActivate();
+
+            // Swap
+            $("input:file.uploadFileInputOutside").change(function(e) {
+                // Remove the existing hidden input
+                $("form#hiddenAttachmentForm input:file").remove();
+
+                // Clone modified file input and empty it
+                var $clone = $("input:file.uploadFileInputOutside").clone(true);
+                $clone.wrap('<form>').closest('form').get(0).reset();
+                $clone.unwrap();
+
+                // Replace the existing input in place, insert to hidden form and detach
+                $("input:file.uploadFileInputOutside")
+                    .replaceWith($clone)
+                    .appendTo($("form#hiddenAttachmentForm"))
+                    .removeClass("uploadFileInputOutside")
+                    .unbind("change");
+
+                // Bind new onchange
+                XenForo.AutoInlineUploader($('form#hiddenAttachmentForm'));
+
+                // Trigger the upload
+                console.log($("form#hiddenAttachmentForm input:file").val());
+                // $('form#hiddenAttachmentForm input:file').trigger("change");
+            });
 
             $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {
                 // upload complete, see; e.$form & e.ajaxData

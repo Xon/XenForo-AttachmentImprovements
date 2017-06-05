@@ -12,12 +12,16 @@
     };
 
     // Add pre-commands
-    document.uploadFlag = false;
-    $("input[type='file']").bindFirst("change",
+    document.uploadTarget = null;
+    $("input:file").bindFirst("change",
         function(e){
-            document.uploadFlag = true;
+            document.uploadTarget = e.target;
             console.log("first!");
         }
     );
+
+    $("input:file").each(function(k, e){
+        console.log(e);
+    });
 }
 (jQuery, this, document);

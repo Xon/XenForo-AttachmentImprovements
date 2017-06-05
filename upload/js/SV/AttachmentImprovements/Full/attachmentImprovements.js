@@ -1,3 +1,4 @@
+
 /** @param {jQuery} $ jQuery Object */
 !function($, window, document, _undefined)
 {
@@ -27,23 +28,27 @@
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
 
-                // ed.restoreSelection();
+                // console.log("boop");
+                // console.log($(document.uploadTarget).closest("form"));
+                // document.uploadTarget = null;
 
-                // var val = $input.val();
-                // if (val !== '')
-                // {
-                //    if (!val.match(/^https?:|ftp:/i))
-                //    {
-                //        val = 'http://' + val;
-                //    }
+                ed.restoreSelection();
 
-                //    ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
-                // }
+                var val = $input.val();
+                if (val !== '')
+                {
+                   if (!val.match(/^https?:|ftp:/i))
+                   {
+                       val = 'http://' + val;
+                   }
 
-                // ed.modalClose();
-                // ed.observeImages();
-                // ed.syncCode();
-                // ed.focus();
+                   ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
+                }
+
+                ed.modalClose();
+                ed.observeImages();
+                ed.syncCode();
+                ed.focus();
             });
 
             if (defaultVal)
@@ -54,8 +59,38 @@
             setTimeout(function() {
                 $input.focus();
             }, 100);
-            
-            $('#redactor_modal_inner').xfActivate();
+
+            // Move the upload form out
+            var $h = $("form#hiddenAttachmentForm");
+            $h.insertAfter($h.parent().closest("form.xenForm"));
+
+            // Activate stuff
+            $('form#hiddenAttachmentForm').parent().xfActivate();
+
+            // Bind swap function
+            $("input:file.uploadFileInputOutside").change(function(e) {
+                // Remove the existing hidden input
+                $("form#hiddenAttachmentForm input:file").remove();
+
+                // Clone modified file input and empty it
+                var $clone = $("input:file.uploadFileInputOutside").clone(true);
+                $clone.wrap('<form>').closest('form').get(0).reset();
+                $clone.unwrap();
+
+                // Replace the existing input in place, insert to hidden form and detach
+                $("input:file.uploadFileInputOutside")
+                    .replaceWith($clone)
+                    .appendTo($("form#hiddenAttachmentForm"))
+                    .removeClass("uploadFileInputOutside")
+                    .unbind("change");
+
+                // Bind new onchange
+                XenForo.AutoInlineUploader($('form#hiddenAttachmentForm'));
+
+                // Trigger the upload
+                console.log($("form#hiddenAttachmentForm input:file").val());
+                // $('form#hiddenAttachmentForm input:file').trigger("change");
+            });
 
             $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {
                 // upload complete, see; e.$form & e.ajaxData
