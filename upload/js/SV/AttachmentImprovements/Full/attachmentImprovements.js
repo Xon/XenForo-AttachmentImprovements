@@ -28,10 +28,6 @@
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
 
-                // console.log("boop");
-                // console.log($(document.uploadTarget).closest("form"));
-                // document.uploadTarget = null;
-
                 ed.restoreSelection();
 
                 var val = $input.val();
@@ -64,7 +60,7 @@
             var $h = $("form#hiddenAttachmentForm");
             $h.insertAfter($h.parent().closest("form.xenForm"));
 
-            // Activate stuff
+            // Activate XenForo scipts
             $('form#hiddenAttachmentForm').parent().xfActivate();
 
             // Bind swap function
@@ -88,8 +84,7 @@
                 XenForo.AutoInlineUploader($('form#hiddenAttachmentForm'));
 
                 // Trigger the upload
-                console.log($("form#hiddenAttachmentForm input:file").val());
-                // $('form#hiddenAttachmentForm input:file').trigger("change");
+                $('form#hiddenAttachmentForm input:file').trigger("change");
             });
 
             $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {

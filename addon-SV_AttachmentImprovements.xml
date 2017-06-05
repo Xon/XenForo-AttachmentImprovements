@@ -125,7 +125,9 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
   <route_prefixes/>
   <style_properties/>
   <templates>
-    <template title="editor_dialog_image_improvements" version_id="1010000" version_string="1.1.0"><![CDATA[<dl class="ctrlUnit">
+    <template title="editor_dialog_image_improvements" version_id="1010000" version_string="1.1.0"><![CDATA[<xen:comment>Note that css is loaded with the template modification editor_js_setup, because apparently editor dialogs don't load css for... reasons????</xen:comment>
+
+<dl class="ctrlUnit">
     <dt><label for="ctrl_upload">{xen:phrase upload_file} (<span title="{xen:phrase x_bytes, 'size={xen:number $attachmentConstraints.size}'}">{xen:phrase max_x, "size={xen:number $attachmentConstraints.size, 'size'}"}</span>):</label></dt>
     <dd id="SWFUploadContainer" data-placeholder="#SWFUploadPlaceHolder" data-trigger="#ctrl_upload">
         <span id="SWFUploadPlaceHolder"></span>
@@ -147,14 +149,21 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
     <dl class="ctrlUnit">
         <dt><label>{xen:phrase existing_attachments}:</label></dt>
         <dd>
-            <ul>
-            <xen:foreach loop="$existingAttachments" value="$attachment">
-                <li>
-                    <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
-                    <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
-                </li>
-            </xen:foreach>
-            </ul>
+            <div class="attachmentContainer">
+                <xen:foreach loop="$existingAttachments" value="$attachment">
+                    <div class="Thumbnail singleAttachment">
+                        <a href="{xen:link attachments, $attachment}" target="_blank"
+                            data-attachmentId="{$attachment.attachment_id}"
+                            class="_not_LbTrigger" data-href="{xen:link misc/lightbox}">
+                            <img src="{$attachment.thumbnailUrl}" alt="{$attachment.filename}" class="_not_LbImage" data-src="{xen:link attachments, $attachment, 'embedded=1'}" />
+                        </a>
+                        <xen:comment>
+                            <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
+                            <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
+                        </xen:comment>
+                    </div>
+                </xen:foreach>
+            </div>
         </dd>
     </dl>
 </xen:if>
@@ -169,7 +178,24 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
     <xen:foreach loop="$attachmentParams.content_data" key="$dataKey" value="$dataValue">
         <input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
     </xen:foreach>
-</form>]]></template>
+</form>
+
+<xen:comment>CSS follows, because apparently editor dialogs don't load CSS for... reasons????</xen:comment>]]></template>
+    <template title="editor_dialog_image_improvements.css" version_id="1010000" version_string="1.1.0"><![CDATA[div.attachmentContainer {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+div.singleAttachment {
+    padding-right: 1em;
+}
+
+div.singleAttachment img {
+    max-width:50px;
+    max-height:50px;
+    width: auto;
+    height: auto;
+}]]></template>
   </templates>
   <public_template_modifications>
     <modification template="editor_dialog_image" modification_key="editor_dialog_image" description="Adds new options to image uploading form" execution_order="10" enabled="1" action="str_replace">
@@ -181,7 +207,10 @@ $0]]></replace>
       <find><![CDATA[#$#]]></find>
       <replace><![CDATA[$0
 <script>
+<xen:require css="attachment_editor.css" />
+<xen:require css="editor_dialog_image_improvements.css" />
 <xen:comment><xen:require js="js/SV/AttachmentImprovements/attachmentImprovements.js" /></xen:comment>
+
 
 /** @param {jQuery} $ jQuery Object */
 !function($, window, document, _undefined)
@@ -212,27 +241,27 @@ $0]]></replace>
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
 
-console.log("boop");
-console.log($(document.uploadTarget).closest("form"));
-document.uploadTarget = null;
+                // console.log("boop");
+                // console.log($(document.uploadTarget).closest("form"));
+                // document.uploadTarget = null;
 
-                // ed.restoreSelection();
+                ed.restoreSelection();
 
-                // var val = $input.val();
-                // if (val !== '')
-                // {
-                //    if (!val.match(/^https?:|ftp:/i))
-                //    {
-                //        val = 'http://' + val;
-                //    }
+                var val = $input.val();
+                if (val !== '')
+                {
+                   if (!val.match(/^https?:|ftp:/i))
+                   {
+                       val = 'http://' + val;
+                   }
 
-                //    ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
-                // }
+                   ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
+                }
 
-                // ed.modalClose();
-                // ed.observeImages();
-                // ed.syncCode();
-                // ed.focus();
+                ed.modalClose();
+                ed.observeImages();
+                ed.syncCode();
+                ed.focus();
             });
 
             if (defaultVal)
@@ -245,13 +274,13 @@ document.uploadTarget = null;
             }, 100);
 
             // Move the upload form out
-            var h = $("form#hiddenAttachmentForm");
-            h.insertAfter(h.parent().closest("form.xenForm"));
+            var $h = $("form#hiddenAttachmentForm");
+            $h.insertAfter($h.parent().closest("form.xenForm"));
 
-            // Activate stuff
+            // Activate XenForo scipts
             $('form#hiddenAttachmentForm').parent().xfActivate();
 
-            // Swap
+            // Bind swap function
             $("input:file.uploadFileInputOutside").change(function(e) {
                 // Remove the existing hidden input
                 $("form#hiddenAttachmentForm input:file").remove();
@@ -272,8 +301,7 @@ document.uploadTarget = null;
                 XenForo.AutoInlineUploader($('form#hiddenAttachmentForm'));
 
                 // Trigger the upload
-                console.log($("form#hiddenAttachmentForm input:file").val());
-                // $('form#hiddenAttachmentForm input:file').trigger("change");
+                $('form#hiddenAttachmentForm input:file').trigger("change");
             });
 
             $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {

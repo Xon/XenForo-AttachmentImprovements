@@ -49,6 +49,11 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         $existingAttachments = $attachmentModel->getRecentAttachments($input);
         $newAttachments = $attachmentModel->getAttachmentsByTempHash($input['hash']);
 
+        foreach ($existingAttachments as $key => $existingAttachment)
+        {
+            $existingAttachments[$key] = $attachmentModel->prepareAttachment($existingAttachment);
+        }
+
         $constraints = $attachmentHandler->getAttachmentConstraints();
         if ($constraints['count'] <= 0)
         {
