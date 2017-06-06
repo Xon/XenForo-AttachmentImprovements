@@ -17,7 +17,10 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 'key' => XenForo_Input::STRING
             ));
 
-            // Get data with assumption that hash is always present as opposed to temp_hash
+            if (!$input['hash'])
+            {
+                $input['hash'] = $this->_input->filterSingle('temp_hash', XenForo_Input::STRING);
+            }
             $attachmentData = $this->_getAttachmentData($input);
 
             // Get extensions
@@ -38,6 +41,19 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         }
 
         return $response;
+    }
+
+
+    public function actionGetNewAttachmentID()
+    {
+        $contentType = $this->_input->filterSingle('contentType', XenForo_Input::STRING);
+        $attachmentID = $this->_input->filterSingle('attachmentID', XenForo_Input::STRING);
+
+        $attachmentModel = $this->_getAttachmentModel();
+        $newID = $attachmentModel->getNewAttachmentID($contentType, $attachmentID);
+
+        $this->_routeMatch->setResponseType('json');
+        return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array("new_id" => $newID));
     }
 
 

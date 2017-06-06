@@ -204,6 +204,24 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         ', $limit), 'attachment_id', array($contentId, $viewingUser['user_id']));
     }
 
+
+    public function getNewAttachmentID($oldAttachmentID, $contentType)
+    {
+        // Attachments can be associated to the same file. Use this here.
+        $tempHash = md5(uniqid('', true));
+
+        /** @var XenForo_DataWriter_Attachment $attachmentDw */
+        $attachmentDw = XenForo_DataWriter::create('XenForo_DataWriter_Attachment');
+        $attachmentDw->bulkSet(array(
+            'data_id'      => $oldAttachmentID,
+            'content_type' => $contentType,
+            'temp_hash'    => $tempHash
+        ));
+        $attachmentDw->save();
+
+        return $attachmentDw->get('attachment_id');
+    }
+
     private function _replaceExtenstion($path, $ext)
     {
         $pos = strrpos($path , '.');

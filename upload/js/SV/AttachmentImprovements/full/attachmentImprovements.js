@@ -64,21 +64,36 @@
 
             // Function to insert to editor
             DialogAttachmentInserter = function(e) {
-                var attachment, attachmentId, img, bbcode, html
+                var $attachment, $form
 
-                attachment = $("img", this);
-                attachmentId = attachment.data('attachmentid');
-                src = attachment.data('src');
+                $attachment = $("img", this);
+                $form = $('form#hiddenAttachmentForm');
 
-                bbcode = '[ATTACH=full]' + attachmentId + '[/ATTACH] ';
-                html = '<img src="' + src + '" class="attachFull bbCodeImage" alt="attachFull' + attachmentId + '" /> ';
+                var payload = {
+                    "attachmentID": $attachment.data('attachmentid'),
+                    "key": $form.find("input[name='key']").val(),
+                    "hash": $form.find("input[name='hash']").val(),
+                    "contentType": $form.find("input[name='content_type']").val(),
+                };
 
-                ed.pasteHtmlAtCaret(html);
+                console.log($form.find("input[name='attachmentIdNormalizer']").val());
 
-                ed.modalClose();
-                ed.observeImages();
-                ed.syncCode();
-                ed.focus();
+                XenForo.ajax(
+                    XenForo.canonicalizeUrl($form.find("input[name='attachmentIdNormalizer']").val()),
+                    payload,
+                    function(ajaxData){
+                        ed.pasteHtmlAtCaret(
+                            '<img src="' + $attachment.data('src') + 
+                            '" class="attachFull bbCodeImage" alt="attachFull' + 
+                            ajaxData['newID'] + '" /> '
+                        );
+
+                        ed.modalClose();
+                        ed.observeImages();
+                        ed.syncCode();
+                        ed.focus();
+                    }
+                )
             }
 
             // Bind swap function
