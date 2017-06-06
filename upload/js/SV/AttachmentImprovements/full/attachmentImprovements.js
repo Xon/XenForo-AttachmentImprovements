@@ -56,7 +56,8 @@
             }, 100);
 
             // Move the upload form out
-            var $h = $("form#hiddenAttachmentForm");
+            var $h = $("form form#hiddenAttachmentForm");
+            $h.parent().closest("form.xenForm").siblings("form").remove();
             $h.insertAfter($h.parent().closest("form.xenForm"));
 
             // Activate XenForo scipts
