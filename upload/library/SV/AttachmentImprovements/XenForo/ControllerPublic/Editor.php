@@ -48,17 +48,12 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
             return array();
         }
 
-        // XenForo_Error::debug(json_encode($attachmentParams));
         $this->_assertCanUploadAndManageAttachments($input['hash'], $input['content_type'], $input['content_data']);
 
         $attachmentModel = $this->_getAttachmentModel();
         $attachmentHandler = $attachmentModel->getAttachmentHandler($input['content_type']); // known to be valid
         $contentId = $attachmentHandler->getContentIdFromContentData($input['content_data']);
 
-        // $existingAttachments = ($contentId
-        //     ? $attachmentModel->getAttachmentsByContentId($input['content_type'], $contentId)
-        //     : array()
-        // );
         $existingAttachments = $attachmentModel->getRecentAttachments($input);
         $newAttachments = $attachmentModel->getAttachmentsByTempHash($input['hash']);
 
