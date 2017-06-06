@@ -1,4 +1,3 @@
-
 /** @param {jQuery} $ jQuery Object */
 !function($, window, document, _undefined)
 {
@@ -27,6 +26,10 @@
 
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
+
+                // console.log("boop");
+                // console.log($(document.uploadTarget).closest("form"));
+                // document.uploadTarget = null;
 
                 ed.restoreSelection();
 
@@ -87,9 +90,14 @@
                 $('form#hiddenAttachmentForm input:file').trigger("change");
             });
 
-            $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {
+            $('#redactor_modal #hiddenAttachmentForm').bind('AutoInlineUploadComplete', function(e) {
                 // upload complete, see; e.$form & e.ajaxData
-                console.log("boop");
+                $("img", e.ajaxData.templateHtml)
+                    .clone()
+                    .before('<span class="centeringHelper"></span>')
+                    .wrap('<div class="Thumbnail singleAttachment">').parent()
+                    .prependTo("div.attachmentContainer");
+                // Probably do an attach here?
             });
 
         }, ed));

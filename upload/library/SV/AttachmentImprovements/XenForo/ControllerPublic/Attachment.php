@@ -13,6 +13,19 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Attachment extends XFCP
         return parent::actionIndex();
     }
 
+    // public function actionDoUpload()
+    // {
+    //     $response = parent::actionDoUpload();
+
+    //     $dialogUpload = $this->_input->filterSingle('imageDialogUploader', XenForo_Input::BOOLEAN);
+    //     if ($dialogUpload && is_a($response, "XenForo_ControllerResponse_View"))
+    //     {
+    //         return $this->responseView('XenForo_ViewPublic_Attachment_DoUpload', '', $response->params);
+    //     }
+
+    //     return $response;
+    // }
+
     protected function _getAttachmentData($input)
     {
         $params = parent::_getAttachmentData($input);

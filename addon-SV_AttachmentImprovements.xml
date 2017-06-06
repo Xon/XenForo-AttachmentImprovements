@@ -162,6 +162,7 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
     <input type="file" name="upload" class="textCtrl" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
 
     <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+    <input type="hidden" name="imageDialogUploader" value="1" />
     <input type="hidden" name="hash" value="{$attachmentParams.hash}" />
     <input type="hidden" name="content_type" value="{$attachmentParams.content_type}" />
     <input type="hidden" name="key" value="{$key}" />
@@ -215,14 +216,15 @@ div.singleAttachment img {
     <template title="editor_dialog_image_improvements_attachment" version_id="1010000" version_string="1.1.0"><![CDATA[<div class="Thumbnail singleAttachment">
     <span class="centeringHelper">
     </span><img src="{$attachment.thumbnailUrl}" alt="{$attachment.filename}" class="_not_LbImage" data-src="{xen:link attachments, $attachment, 'embedded=1'}" />   
-    <xen:comment>
-        <a href="{xen:link attachments, $attachment}" target="_blank"
-            data-attachmentId="{$attachment.attachment_id}"
-            class="_not_LbTrigger" data-href="{xen:link misc/lightbox}">
-        <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
-        <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
-    </xen:comment>
-</div>]]></template>
+</div>
+
+<xen:comment>
+    <a href="{xen:link attachments, $attachment}" target="_blank"
+        data-attachmentId="{$attachment.attachment_id}"
+        class="_not_LbTrigger" data-href="{xen:link misc/lightbox}">
+    <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
+    <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
+</xen:comment>]]></template>
   </templates>
   <public_template_modifications>
     <modification template="editor_dialog_image" modification_key="editor_dialog_image" description="Adds new options to image uploading form" execution_order="10" enabled="1" action="str_replace">
@@ -331,9 +333,13 @@ $0]]></replace>
                 $('form#hiddenAttachmentForm input:file').trigger("change");
             });
 
-            $('#redactor_modal_inner .AttachmentUploadForm').bind('AutoInlineUploadComplete', function(e) {
+            $('#redactor_modal #hiddenAttachmentForm').bind('AutoInlineUploadComplete', function(e) {
                 // upload complete, see; e.$form & e.ajaxData
-                console.log("boop");
+                $("img", e.ajaxData.templateHtml)
+                    .clone()
+                    .before('<span class="centeringHelper"></span>')
+                    .wrap('<div class="Thumbnail singleAttachment">').parent()
+                    .prependTo("div.attachmentContainer");
             });
 
         }, ed));
