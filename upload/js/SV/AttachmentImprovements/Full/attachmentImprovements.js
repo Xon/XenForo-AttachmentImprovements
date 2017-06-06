@@ -16,7 +16,7 @@
         var selHtml = ed.getSelectedHtml(), defaultVal;
         if (selHtml.match(/^\s*<img[^>]+src="([^"]+)"[^>]*>\s*$/) && !selHtml.match(/mceSmilie|attachFull|attachThumb/))
         {
-            defaultVal = RegExp.\$1; // this assignment is needed because jQuery uses a regex
+            defaultVal = RegExp.$1; // this assignment is needed because jQuery uses a regex
             defaultVal = $('<textarea>').html(defaultVal).text();
         }
 
@@ -26,10 +26,6 @@
 
             $('#redactor_image_btn').click(function(e) {
                 e.preventDefault();
-
-                // console.log("boop");
-                // console.log($(document.uploadTarget).closest("form"));
-                // document.uploadTarget = null;
 
                 ed.restoreSelection();
 
@@ -66,6 +62,25 @@
             // Activate XenForo scipts
             $('form#hiddenAttachmentForm').parent().xfActivate();
 
+            // Function to insert to editor
+            DialogAttachmentInserter = function(e) {
+                var attachment, attachmentId, img, bbcode, html
+
+                attachment = $("img", this);
+                attachmentId = attachment.data('attachmentid');
+                src = attachment.data('src');
+
+                bbcode = '[ATTACH=full]' + attachmentId + '[/ATTACH] ';
+                html = '<img src="' + src + '" class="attachFull bbCodeImage" alt="attachFull' + attachmentId + '" /> ';
+
+                ed.pasteHtmlAtCaret(html);
+
+                ed.modalClose();
+                ed.observeImages();
+                ed.syncCode();
+                ed.focus();
+            }
+
             // Bind swap function
             $("input:file.uploadFileInputOutside").change(function(e) {
                 // Remove the existing hidden input
@@ -90,14 +105,19 @@
                 $('form#hiddenAttachmentForm input:file').trigger("change");
             });
 
+            // Bind attachment inserter
+            $(".singleAttachment").click(DialogAttachmentInserter);
+
+            // Bind upload completion handler
             $('#redactor_modal #hiddenAttachmentForm').bind('AutoInlineUploadComplete', function(e) {
-                // upload complete, see; e.$form & e.ajaxData
+                id = $("a._not_LbTrigger", e.ajaxData.templateHtml).data('attachmentid');
                 $("img", e.ajaxData.templateHtml)
                     .clone()
-                    .before('<span class="centeringHelper"></span>')
-                    .wrap('<div class="Thumbnail singleAttachment">').parent()
-                    .prependTo("div.attachmentContainer");
-                // Probably do an attach here?
+                    .attr('data-attachmentid', id)
+                    .wrap('<div class="Thumbnail singleAttachment">')
+                    .before('<span class="centeringHelper"></span>').parent()
+                    .prependTo("div.attachmentContainer")
+                    .click(DialogAttachmentInserter);
             });
 
         }, ed));

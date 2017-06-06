@@ -215,16 +215,8 @@ div.singleAttachment img {
 }]]></template>
     <template title="editor_dialog_image_improvements_attachment" version_id="1010000" version_string="1.1.0"><![CDATA[<div class="Thumbnail singleAttachment">
     <span class="centeringHelper">
-    </span><img src="{$attachment.thumbnailUrl}" alt="{$attachment.filename}" class="_not_LbImage" data-src="{xen:link attachments, $attachment, 'embedded=1'}" />   
-</div>
-
-<xen:comment>
-    <a href="{xen:link attachments, $attachment}" target="_blank"
-        data-attachmentId="{$attachment.attachment_id}"
-        class="_not_LbTrigger" data-href="{xen:link misc/lightbox}">
-    <a href="{xen:link attachments, $attachment}">{$attachment.filename}</a>
-    <input type="submit" name="delete[{$attachment.attachment_id}]" value="{xen:phrase delete}" class="button" />
-</xen:comment>]]></template>
+    </span><img src="{$attachment.thumbnailUrl}" alt="{$attachment.filename}" class="_not_LbImage" data-attachmentid="{$attachment.attachment_id}" data-src="{xen:link attachments, $attachment, 'embedded=1'}" />   
+</div>]]></template>
   </templates>
   <public_template_modifications>
     <modification template="editor_dialog_image" modification_key="editor_dialog_image" description="Adds new options to image uploading form" execution_order="10" enabled="1" action="str_replace">
@@ -232,121 +224,12 @@ div.singleAttachment img {
       <replace><![CDATA[<xen:include template="editor_dialog_image_improvements" />
 $0]]></replace>
     </modification>
-    <modification template="editor_js_setup" modification_key="editor_js_setup" description="Adds additional data to image dialog request" execution_order="10" enabled="1" action="preg_replace">
+    <modification template="editor_js_setup" modification_key="editor_js_setup" description="Adds js and css to image dialog" execution_order="10" enabled="1" action="preg_replace">
       <find><![CDATA[#$#]]></find>
       <replace><![CDATA[$0
-<script>
 <xen:require css="attachment_editor.css" />
 <xen:require css="editor_dialog_image_improvements.css" />
-<xen:comment><xen:require js="js/SV/AttachmentImprovements/attachmentImprovements.js" /></xen:comment>
-
-
-/** @param {jQuery} $ jQuery Object */
-!function($, window, document, _undefined)
-{
-    var xf_getImageModal = XenForo.BbCodeWysiwygEditor.prototype.getImageModal;
-    XenForo.BbCodeWysiwygEditor.prototype.getImageModal = function(ed) {
-        var dialogUrl = this.dialogUrl;
-        var href = $("input#ctrl_uploader").data("href");
-        if (href && this.dialogUrl) {
-            var i = href.indexOf('?');
-            dialogUrl = dialogUrl + "&" + href.substring(i + 1);
-        }
-        var self = this;
-
-        ed.saveSelection();
-
-        var selHtml = ed.getSelectedHtml(), defaultVal;
-        if (selHtml.match(/^\s*<img[^>]+src="([^"]+)"[^>]*>\s*$/) && !selHtml.match(/mceSmilie|attachFull|attachThumb/))
-        {
-            defaultVal = RegExp.\$1; // this assignment is needed because jQuery uses a regex
-            defaultVal = $('<textarea>').html(defaultVal).text();
-        }
-
-        ed.modalInit(this.getText('image'), { url: dialogUrl + '&dialog=image' }, 600, $.proxy(function()
-        {
-            var $input = $('#redactor_image_link');
-
-            $('#redactor_image_btn').click(function(e) {
-                e.preventDefault();
-
-                // console.log("boop");
-                // console.log($(document.uploadTarget).closest("form"));
-                // document.uploadTarget = null;
-
-                ed.restoreSelection();
-
-                var val = $input.val();
-                if (val !== '')
-                {
-                   if (!val.match(/^https?:|ftp:/i))
-                   {
-                       val = 'http://' + val;
-                   }
-
-                   ed.pasteHtmlAtCaret('<img src="' + XenForo.htmlspecialchars(val) + '" alt="[IMG]" unselectable="on" />&nbsp;');
-                }
-
-                ed.modalClose();
-                ed.observeImages();
-                ed.syncCode();
-                ed.focus();
-            });
-
-            if (defaultVal)
-            {
-                $input.val(defaultVal);
-            }
-
-            setTimeout(function() {
-                $input.focus();
-            }, 100);
-
-            // Move the upload form out
-            var $h = $("form#hiddenAttachmentForm");
-            $h.insertAfter($h.parent().closest("form.xenForm"));
-
-            // Activate XenForo scipts
-            $('form#hiddenAttachmentForm').parent().xfActivate();
-
-            // Bind swap function
-            $("input:file.uploadFileInputOutside").change(function(e) {
-                // Remove the existing hidden input
-                $("form#hiddenAttachmentForm input:file").remove();
-
-                // Clone modified file input and empty it
-                var $clone = $("input:file.uploadFileInputOutside").clone(true);
-                $clone.wrap('<form>').closest('form').get(0).reset();
-                $clone.unwrap();
-
-                // Replace the existing input in place, insert to hidden form and detach
-                $("input:file.uploadFileInputOutside")
-                    .replaceWith($clone)
-                    .appendTo($("form#hiddenAttachmentForm"))
-                    .removeClass("uploadFileInputOutside")
-                    .unbind("change");
-
-                // Bind new onchange
-                XenForo.AutoInlineUploader($('form#hiddenAttachmentForm'));
-
-                // Trigger the upload
-                $('form#hiddenAttachmentForm input:file').trigger("change");
-            });
-
-            $('#redactor_modal #hiddenAttachmentForm').bind('AutoInlineUploadComplete', function(e) {
-                // upload complete, see; e.$form & e.ajaxData
-                $("img", e.ajaxData.templateHtml)
-                    .clone()
-                    .before('<span class="centeringHelper"></span>')
-                    .wrap('<div class="Thumbnail singleAttachment">').parent()
-                    .prependTo("div.attachmentContainer");
-            });
-
-        }, ed));
-    };
-}
-(jQuery, this, document);
-</script>]]></replace>
+<xen:require js="js/SV/AttachmentImprovements/attachmentImprovements.js" />]]></replace>
     </modification>
   </public_template_modifications>
   <bb_code_media_sites/>
