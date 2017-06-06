@@ -95,8 +95,8 @@
                         ed.syncCode();
                         ed.focus();
                     }
-                )
-            }
+                );
+            };
 
             // Bind swap function
             $("input:file.uploadFileInputOutside").change(function(e) {
