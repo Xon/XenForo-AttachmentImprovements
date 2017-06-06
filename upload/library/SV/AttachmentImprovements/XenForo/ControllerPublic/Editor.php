@@ -16,15 +16,28 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 'content_data' => array(XenForo_Input::UINT, 'array' => true),
                 'key' => XenForo_Input::STRING
             ));
-            // Assumption: Always has hash as opposed to temp_hash
 
+            // Get data with assumption that hash is always present as opposed to temp_hash
             $attachmentData = $this->_getAttachmentData($input);
+
+            // Get extensions
+            $extensions = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
+            $attachmentData['attachmentConstraints']['extensions'] = $extensions;
+
+            // Filter attachments by extensions
+            $extensions = array_flip($extensions);
+            $attachmentData["existingAttachments"] = array_filter(
+                $attachmentData["existingAttachments"], function($val) use ($extensions)
+                {
+                    return isset($extensions[$val["extension"]]);
+                }
+            );
+
+            // Merge in attachment data
             $response->params = array_merge($response->params, $attachmentData);
-            $response->params['attachmentConstraints']['extensions'] = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
         }
 
         return $response;
-        // Next step: change template
     }
 
 
