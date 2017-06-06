@@ -205,17 +205,14 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
     }
 
 
-    public function getNewAttachmentID($oldAttachmentID, $contentType)
+    public function makeNewAttachmentID($oldAttachmentID, $contentType, $hash)
     {
-        // Attachments can be associated to the same file. Use this here.
-        $tempHash = md5(uniqid('', true));
-
         /** @var XenForo_DataWriter_Attachment $attachmentDw */
         $attachmentDw = XenForo_DataWriter::create('XenForo_DataWriter_Attachment');
         $attachmentDw->bulkSet(array(
             'data_id'      => $oldAttachmentID,
             'content_type' => $contentType,
-            'temp_hash'    => $tempHash
+            'temp_hash'    => $hash
         ));
         $attachmentDw->save();
 

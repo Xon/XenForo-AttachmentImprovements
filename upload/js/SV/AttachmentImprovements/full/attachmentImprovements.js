@@ -65,11 +65,9 @@
 
             // Function to insert to editor
             DialogAttachmentInserter = function(e) {
-                var $attachment, $form
+                var $attachment = $("img", this), $form = $('form#hiddenAttachmentForm');
 
-                $attachment = $("img", this);
-                $form = $('form#hiddenAttachmentForm');
-
+                var target = $form.find("input[name='attachmentIdNormalizer']").val();
                 var payload = {
                     "attachmentID": $attachment.data('attachmentid'),
                     "key": $form.find("input[name='key']").val(),
@@ -77,10 +75,13 @@
                     "contentType": $form.find("input[name='content_type']").val(),
                 };
 
-                console.log($form.find("input[name='attachmentIdNormalizer']").val());
+                if (!target) {
+                    console.log("No target URL found.");
+                    return;
+                }
 
                 XenForo.ajax(
-                    XenForo.canonicalizeUrl($form.find("input[name='attachmentIdNormalizer']").val()),
+                    XenForo.canonicalizeUrl(target),
                     payload,
                     function(ajaxData){
                         ed.pasteHtmlAtCaret(

@@ -44,13 +44,14 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
     }
 
 
-    public function actionGetNewAttachmentID()
+    public function actionMakeNewAttachmentID()
     {
+        $hash = $this->_input->filterSingle('hash', XenForo_Input::STRING);
         $contentType = $this->_input->filterSingle('contentType', XenForo_Input::STRING);
         $attachmentID = $this->_input->filterSingle('attachmentID', XenForo_Input::STRING);
 
         $attachmentModel = $this->_getAttachmentModel();
-        $newID = $attachmentModel->getNewAttachmentID($contentType, $attachmentID);
+        $newID = $attachmentModel->makeNewAttachmentID($contentType, $attachmentID, $hash);
 
         $this->_routeMatch->setResponseType('json');
         return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array("new_id" => $newID));
