@@ -160,19 +160,21 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
     </dl>
 </xen:if>
 
-<form action="{xen:link 'attachments/do-upload'}" method="post" id="hiddenAttachmentForm" style="display:none" enctype="multipart/form-data" class="AutoInlineUploader AttachmentUploadForm xenForm">
-    <input type="file" name="upload" class="textCtrl" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
+<xen:if is="{$attachmentParams}">
+    <form action="{xen:link 'attachments/do-upload'}" method="post" id="hiddenAttachmentForm" style="display:none" enctype="multipart/form-data" class="AutoInlineUploader AttachmentUploadForm xenForm">
+        <input type="file" name="upload" class="textCtrl" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
 
-    <input type="hidden" name="attachmentIdNormalizer" value="{xen:link 'editor/makeNewAttachmentID'}" />
-    <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
-    <input type="hidden" name="imageDialogUploader" value="1" />
-    <input type="hidden" name="hash" value="{$attachmentParams.hash}" />
-    <input type="hidden" name="content_type" value="{$attachmentParams.content_type}" />
-    <input type="hidden" name="key" value="{$key}" />
-    <xen:foreach loop="$attachmentParams.content_data" key="$dataKey" value="$dataValue">
-        <input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
-    </xen:foreach>
-</form>
+        <input type="hidden" name="attachmentIdNormalizer" value="{xen:link 'editor/makeNewAttachmentID'}" />
+        <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+        <input type="hidden" name="imageDialogUploader" value="1" />
+        <input type="hidden" name="hash" value="{$attachmentParams.hash}" />
+        <input type="hidden" name="content_type" value="{$attachmentParams.content_type}" />
+        <input type="hidden" name="key" value="{$key}" />
+        <xen:foreach loop="$attachmentParams.content_data" key="$dataKey" value="$dataValue">
+            <input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
+        </xen:foreach>
+    </form>
+</xen:if>
 
 <xen:comment>CSS follows, because apparently editor dialogs don't load CSS for... reasons????</xen:comment>]]></template>
     <template title="editor_dialog_image_improvements.css" version_id="1010000" version_string="1.1.0"><![CDATA[div.attachmentContainer {
