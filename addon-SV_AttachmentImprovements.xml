@@ -127,23 +127,25 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
   <templates>
     <template title="editor_dialog_image_improvements" version_id="1010000" version_string="1.1.0"><![CDATA[<xen:comment>Note that css is loaded with the template modification editor_js_setup, because apparently editor dialogs don't load css for... reasons????</xen:comment>
 
-<dl class="ctrlUnit">
-    <dt><label for="ctrl_upload">{xen:phrase upload_file} (<span title="{xen:phrase x_bytes, 'size={xen:number $attachmentConstraints.size}'}">{xen:phrase max_x, "size={xen:number $attachmentConstraints.size, 'size'}"}</span>):</label></dt>
-    <dd id="SWFUploadContainer" data-placeholder="#SWFUploadPlaceHolder" data-trigger="#ctrl_upload">
-        <span id="SWFUploadPlaceHolder"></span>
-        <input type="file" name="upload" class="textCtrl uploadFileInputOutside" onchange="this.blur()" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
+<xen:if is="{$attachmentConstraints}">
+    <dl class="ctrlUnit">
+        <dt><label for="ctrl_upload">{xen:phrase upload_file} (<span title="{xen:phrase x_bytes, 'size={xen:number $attachmentConstraints.size}'}">{xen:phrase max_x, "size={xen:number $attachmentConstraints.size, 'size'}"}</span>):</label></dt>
+        <dd id="SWFUploadContainer" data-placeholder="#SWFUploadPlaceHolder" data-trigger="#ctrl_upload">
+            <span id="SWFUploadPlaceHolder"></span>
+            <input type="file" name="upload" class="textCtrl uploadFileInputOutside" onchange="this.blur()" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
 
-        <div class="attachmentConstraints pairsRows">
-            <dl><dt>{xen:phrase accepted_file_types}:</dt> <dd>{xen:helper implode, $attachmentConstraints.extensions, ', '}</dd></dl>
-            <xen:if is="{$attachmentConstraints.width}">
-                <dl><dt>{xen:phrase max_image_width}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.width}'}</dd></dl>
-            </xen:if>
-            <xen:if is="{$attachmentConstraints.height}">
-                <dl><dt>{xen:phrase max_image_height}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.height}'}</dd></dl>
-            </xen:if>
-        </div>
-    </dd>
-</dl>
+            <div class="attachmentConstraints pairsRows">
+                <dl><dt>{xen:phrase accepted_file_types}:</dt> <dd>{xen:helper implode, $attachmentConstraints.extensions, ', '}</dd></dl>
+                <xen:if is="{$attachmentConstraints.width}">
+                    <dl><dt>{xen:phrase max_image_width}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.width}'}</dd></dl>
+                </xen:if>
+                <xen:if is="{$attachmentConstraints.height}">
+                    <dl><dt>{xen:phrase max_image_height}:</dt> <dd>{xen:phrase x_pixels, 'size={xen:number $attachmentConstraints.height}'}</dd></dl>
+                </xen:if>
+            </div>
+        </dd>
+    </dl>
+</xen:if>
 
 <xen:if is="{$existingAttachments}">
     <dl class="ctrlUnit">

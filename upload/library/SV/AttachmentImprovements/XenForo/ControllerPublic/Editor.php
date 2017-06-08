@@ -17,27 +17,30 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 'key' => XenForo_Input::STRING
             ));
 
-            if (!$input['hash'])
+            if (isset($content_type))
             {
-                $input['hash'] = $this->_input->filterSingle('temp_hash', XenForo_Input::STRING);
-            }
-            $attachmentData = $this->_getAttachmentData($input);
-
-            // Get extensions
-            $extensions = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
-            $attachmentData['attachmentConstraints']['extensions'] = $extensions;
-
-            // Filter attachments by extensions
-            $extensions = array_flip($extensions);
-            $attachmentData["existingAttachments"] = array_filter(
-                $attachmentData["existingAttachments"], function($val) use ($extensions)
+                if (!$input['hash'])
                 {
-                    return isset($extensions[$val["extension"]]);
+                    $input['hash'] = $this->_input->filterSingle('temp_hash', XenForo_Input::STRING);
                 }
-            );
+                $attachmentData = $this->_getAttachmentData($input);
 
-            // Merge in attachment data
-            $response->params = array_merge($response->params, $attachmentData);
+                // Get extensions
+                $extensions = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
+                $attachmentData['attachmentConstraints']['extensions'] = $extensions;
+
+                // Filter attachments by extensions
+                $extensions = array_flip($extensions);
+                $attachmentData["existingAttachments"] = array_filter(
+                    $attachmentData["existingAttachments"], function($val) use ($extensions)
+                    {
+                        return isset($extensions[$val["extension"]]);
+                    }
+                );
+
+                // Merge in attachment data
+                $response->params = array_merge($response->params, $attachmentData);
+            }
         }
 
         return $response;
