@@ -23,7 +23,7 @@
   <email_templates/>
   <email_template_modifications/>
   <optiongroups>
-    <group group_id="SV_AttachImpro_Debug" display_order="1" debug_only="1"/>
+    <group group_id="SV_AttachImpro_Debug" display_order="541" debug_only="1"/>
     <option option_id="SV_AttachImpro_XAR" edit_format="onoff" data_type="boolean" can_backup="1">
       <default_value>0</default_value>
       <edit_format_params></edit_format_params>
