@@ -17,7 +17,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 'key' => XenForo_Input::STRING
             ));
 
-            if (isset($content_type))
+            if (isset($input['content_type']))
             {
                 if (!$input['hash'])
                 {
