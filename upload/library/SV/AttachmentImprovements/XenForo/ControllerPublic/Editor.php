@@ -47,17 +47,24 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
     }
 
 
-    public function actionMakeNewAttachmentID()
+    public function actionMakeNewAttachment()
     {
+        $this->_routeMatch->setResponseType('json');
         $hash = $this->_input->filterSingle('hash', XenForo_Input::STRING);
-        $contentType = $this->_input->filterSingle('contentType', XenForo_Input::STRING);
-        $attachmentID = $this->_input->filterSingle('attachmentID', XenForo_Input::STRING);
+        $attachmentId = $this->_input->filterSingle('attachmentID', XenForo_Input::STRING);
 
         $attachmentModel = $this->_getAttachmentModel();
-        $newID = $attachmentModel->makeNewAttachmentID($contentType, $attachmentID, $hash);
+        $attachment = $attachmentModel->makeNewAttachment($attachmentId, $hash);
+        if (empty($attachment))
+        {
+            // todo: 404
+            return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array());    
+        }
 
-        $this->_routeMatch->setResponseType('json');
-        return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array("new_id" => $newID));
+        return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array(
+            "id" => $attachment['attachment_id'], 
+            'url' => XenForo_Link::buildPublicLink('full:attachments', $attachment),
+        ));
     }
 
 

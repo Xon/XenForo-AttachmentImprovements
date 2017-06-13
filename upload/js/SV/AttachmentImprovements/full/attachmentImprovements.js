@@ -84,16 +84,16 @@
                     XenForo.canonicalizeUrl(target),
                     payload,
                     function(ajaxData){
-                        ed.pasteHtmlAtCaret(
-                            '<img src="' + $attachment.data('src') + 
-                            '" class="attachFull bbCodeImage" alt="attachFull' + 
-                            ajaxData['newID'] + '" /> '
-                        );
+                        if ('url' in ajaxData) {
+                            ed.pasteHtmlAtCaret(
+                                '<img src="' + ajaxData['url'] + '" class="attachFull bbCodeImage" alt="attachFull' + ajaxData['id'] + '" /> '
+                            );
 
-                        ed.modalClose();
-                        ed.observeImages();
-                        ed.syncCode();
-                        ed.focus();
+                            ed.modalClose();
+                            ed.observeImages();
+                            ed.syncCode();
+                            ed.focus();
+                        }
                     }
                 );
             };

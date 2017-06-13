@@ -205,18 +205,22 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
     }
 
 
-    public function makeNewAttachmentID($oldAttachmentID, $contentType, $hash)
+    public function makeNewAttachment($oldAttachmentID, $hash)
     {
+        $oldAttachment = $this->getAttachmentById($oldAttachmentID);
+        if (empty($oldAttachment))
+        {
+            return null;
+        }
         /** @var XenForo_DataWriter_Attachment $attachmentDw */
         $attachmentDw = XenForo_DataWriter::create('XenForo_DataWriter_Attachment');
         $attachmentDw->bulkSet(array(
-            'data_id'      => $oldAttachmentID,
-            'content_type' => $contentType,
+            'data_id'      => $oldAttachment['data_id'],
             'temp_hash'    => $hash
         ));
         $attachmentDw->save();
 
-        return $attachmentDw->get('attachment_id');
+        return $this->getAttachmentById($attachmentDw->get('attachment_id'));
     }
 
     private function _replaceExtenstion($path, $ext)

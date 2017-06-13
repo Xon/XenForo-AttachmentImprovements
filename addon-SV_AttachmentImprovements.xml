@@ -164,7 +164,7 @@ Rebuild Attachment Thumbnails to enforce a change in bad tags/attributes.<br/>
     <form action="{xen:link 'attachments/do-upload'}" method="post" id="hiddenAttachmentForm" style="display:none" enctype="multipart/form-data" class="AutoInlineUploader AttachmentUploadForm xenForm">
         <input type="file" name="upload" class="textCtrl" id="ctrl_upload" accept="<xen:foreach loop="$attachmentConstraints.extensions" i="$i" count="$count" value="$extension">.{$extension}{xen:if '{$i} < {$count}', ','}</xen:foreach>"/>
 
-        <input type="hidden" name="attachmentIdNormalizer" value="{xen:link 'editor/makeNewAttachmentID'}" />
+        <input type="hidden" name="attachmentIdNormalizer" value="{xen:link 'editor/make-new-attachment'}" />
         <input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
         <input type="hidden" name="imageDialogUploader" value="1" />
         <input type="hidden" name="hash" value="{$attachmentParams.hash}" />
@@ -234,7 +234,11 @@ $0]]></replace>
       <replace><![CDATA[$0
 <xen:require css="attachment_editor.css" />
 <xen:require css="editor_dialog_image_improvements.css" />
-<xen:require js="js/SV/AttachmentImprovements/attachmentImprovements.js" />]]></replace>
+<xen:if is="{$debugMode}">
+<xen:require js="js/SV/AttachmentImprovements/full/attachmentImprovements.js" />
+<xen:else />
+<xen:require js="js/SV/AttachmentImprovements/attachmentImprovements.js" />
+</xen:if>]]></replace>
     </modification>
   </public_template_modifications>
   <bb_code_media_sites/>
