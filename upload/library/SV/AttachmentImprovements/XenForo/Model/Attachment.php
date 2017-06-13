@@ -207,15 +207,37 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 
     public function makeNewAttachment($oldAttachmentID, $hash)
     {
+        if (empty($hash))
+        {
+            return null;
+        }
         $oldAttachment = $this->getAttachmentById($oldAttachmentID);
         if (empty($oldAttachment))
         {
             return null;
         }
+
+        // re-use the existing attachment on this content
+        if ($oldAttachment['temp_hash'] == $hash)
+        {
+            return $oldAttachment;
+        }
+
+        $dataId = $oldAttachment['data_id'];
+        $existingAttachmentId = $this->_getDb()->fetchOne('
+            select attachment_id 
+            from xf_attachment where data_id = ? and temp_hash = ?
+            limit 1
+        ', array($dataId, $hash));
+        if ($existingAttachmentId)
+        {
+            return $this->getAttachmentById($existingAttachmentId);
+        }
+
         /** @var XenForo_DataWriter_Attachment $attachmentDw */
         $attachmentDw = XenForo_DataWriter::create('XenForo_DataWriter_Attachment');
         $attachmentDw->bulkSet(array(
-            'data_id'      => $oldAttachment['data_id'],
+            'data_id'      => $dataId,
             'temp_hash'    => $hash
         ));
         $attachmentDw->save();
