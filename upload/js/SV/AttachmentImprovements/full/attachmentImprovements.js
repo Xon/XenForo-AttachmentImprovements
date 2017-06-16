@@ -10,6 +10,9 @@
             dialogUrl = dialogUrl + "&" + href.substring(i + 1);
         }
         var self = this;
+        
+        // Holder variable for uploads
+        document.newAttachments = typeof document.newAttachments !== 'undefined' ? document.newAttachments : [];
 
         ed.saveSelection();
 
@@ -127,15 +130,27 @@
 
             // Bind upload completion handler
             $('#redactor_modal #hiddenAttachmentForm').bind('AutoInlineUploadComplete', function(e) {
-                id = $("a._not_LbTrigger", e.ajaxData.templateHtml).data('attachmentid');
-                $("img", e.ajaxData.templateHtml)
+                var id = $("a._not_LbTrigger", e.ajaxData.templateHtml).data('attachmentid');
+
+                var newAttachment = $("img", e.ajaxData.templateHtml)
                     .clone()
                     .attr('data-attachmentid', id)
                     .wrap('<div class="Thumbnail singleAttachment">')
                     .before('<span class="centeringHelper"></span>').parent()
-                    .prependTo("div.attachmentContainer")
+                    .prependTo("#redactor_modal div.attachmentContainer")
                     .click(DialogAttachmentInserter);
+
+                // Save element
+                document.newAttachments.push(newAttachment);
             });
+
+            // Reattach attachments on reloading overlay
+            if (document.newAttachments.length){
+                var container = $('#redactor_modal div.attachmentContainer');
+                $.each(document.newAttachments, function(i, ele){
+                    ele.prependTo(container).click(DialogAttachmentInserter);
+                });
+            }
 
         }, ed));
     };
