@@ -62,9 +62,46 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         }
 
         return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array(
-            "id" => $attachment['attachment_id'], 
+            'id' => $attachment['attachment_id'], 
             'url' => XenForo_Link::buildPublicLink('full:attachments', $attachment),
         ));
+    }
+
+
+    public function actionGetRecentAttachments()
+    {
+        $numberOfExisting = $this->_input->filterSingle("existing", XenForo_Input::UINT);
+        $input = $this->_input->filter(array(
+            'hash' => XenForo_Input::STRING,
+            'content_type' => XenForo_Input::STRING,
+            'content_data' => array(XenForo_Input::UINT, 'array' => true),
+            'key' => XenForo_Input::STRING
+        ));
+
+        if (!$input['hash'])
+        {
+            $input['hash'] = $this->_input->filterSingle('temp_hash', XenForo_Input::STRING);
+        }
+
+        $this->_assertCanUploadAndManageAttachments($input['hash'], $input['content_type'], $input['content_data']);
+
+        $attachmentModel = $this->_getAttachmentModel();
+
+        $numberToLoad = 10;
+        $nextAttachments = $attachmentModel->getRecentAttachments($input, $numberToLoad, $numberOfExisting);
+
+        foreach ($nextAttachments as $key => $nextAttachment)
+        {
+            $nextAttachments[$key] = $attachmentModel->prepareAttachment($nextAttachment);
+        }
+
+        return $this->responseView('XenForo_ViewPublic_Base', 
+            'editor_dialog_image_improvements_multi_attachments', 
+            array(
+                "attachments" => $nextAttachments, 
+                "loadedAll" => sizeof($nextAttachments) != $numberToLoad
+            )
+        );
     }
 
 
@@ -81,7 +118,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         $attachmentHandler = $attachmentModel->getAttachmentHandler($input['content_type']); // known to be valid
         $contentId = $attachmentHandler->getContentIdFromContentData($input['content_data']);
 
-        $existingAttachments = $attachmentModel->getRecentAttachments($input);
+        $existingAttachments = $attachmentModel->getRecentAttachments($input, 4);
         $newAttachments = $attachmentModel->getAttachmentsByTempHash($input['hash']);
 
         foreach ($existingAttachments as $key => $existingAttachment)

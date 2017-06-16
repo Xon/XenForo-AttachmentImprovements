@@ -72,10 +72,11 @@
 
                 var target = $form.find("input[name='attachmentIdNormalizer']").val();
                 var payload = {
+                    "_xfToken": $form.find("input[name='_xfToken']").val(),
                     "attachmentID": $attachment.data('attachmentid'),
                     "key": $form.find("input[name='key']").val(),
                     "hash": $form.find("input[name='hash']").val(),
-                    "contentType": $form.find("input[name='content_type']").val(),
+                    "content_type": $form.find("input[name='content_type']").val(),
                 };
 
                 if (!target) {
@@ -101,6 +102,9 @@
                 );
             };
 
+            // Bind attachment inserter
+            $(".singleAttachment").click(DialogAttachmentInserter);
+
             // Bind swap function
             $("input:file.uploadFileInputOutside").change(function(e) {
                 // Remove the existing hidden input
@@ -125,9 +129,6 @@
                 $('form#hiddenAttachmentForm input:file').trigger("change");
             });
 
-            // Bind attachment inserter
-            $(".singleAttachment").click(DialogAttachmentInserter);
-
             // Bind upload completion handler
             $('#redactor_modal #hiddenAttachmentForm').bind('AutoInlineUploadComplete', function(e) {
                 var id = $("a._not_LbTrigger", e.ajaxData.templateHtml).data('attachmentid');
@@ -142,6 +143,46 @@
 
                 // Save element
                 document.newAttachments.push(newAttachment);
+            });
+
+            // Bind load more function
+            $(".moreAttachments").click(function(e){
+                var $attachment = $("img", this), $form = $('form#hiddenAttachmentForm');
+
+                var target = $form.find("input[name='attachmentFetcher']").val();
+                var payload = {
+                    "_xfToken": $form.find("input[name='_xfToken']").val(),
+                    "attachmentID": $attachment.data('attachmentid'),
+                    "key": $form.find("input[name='key']").val(),
+                    "hash": $form.find("input[name='hash']").val(),
+                    "content_type": $form.find("input[name='content_type']").val(),
+                    "existing": $(".moreAttachments").first().siblings().length
+                };
+
+                $("input[name^='content_data']", $form).each(function(i, ele){
+                    payload[$(ele).attr('name')] = $(ele).val();
+                });
+
+                if (!target) {
+                    console.log("No target URL found.");
+                    return;
+                }
+
+                XenForo.ajax(
+                    XenForo.canonicalizeUrl(target),
+                    payload,
+                    function(ajaxData){
+                        var $newAttachments = $(ajaxData.templateHtml);
+
+                        $newAttachments
+                            .xfInsert('insertBefore', e.target)
+                            .click(DialogAttachmentInserter);
+
+                        if ($('span#loaded_all').length){
+                            e.target.remove();
+                        }
+                    }
+                );
             });
 
             // Reattach attachments on reloading overlay

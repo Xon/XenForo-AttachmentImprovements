@@ -183,7 +183,7 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         return $url;
     }
 
-    public function getRecentAttachments($input, $limit = 5, array $viewingUser = null)
+    public function getRecentAttachments($input, $limit = 5, $offset = 0, array $viewingUser = null)
     {
         $this->standardizeViewingUserReference($viewingUser);
 
@@ -201,7 +201,7 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 				(data.data_id = attachment.data_id)
             WHERE attachment.content_id <> ? and data.user_id = ?
             ORDER BY attachment.attach_date DESC
-        ', $limit), 'attachment_id', array($contentId, $viewingUser['user_id']));
+        ', $limit, $offset), 'attachment_id', array($contentId, $viewingUser['user_id']));
     }
 
 
