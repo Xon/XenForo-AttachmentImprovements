@@ -187,10 +187,6 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
     {
         $this->standardizeViewingUserReference($viewingUser);
 
-        $contentType = $input['content_type'];
-        $attachmentHandler = $this->getAttachmentHandler($contentType); // known to be valid
-        $contentId = $attachmentHandler->getContentIdFromContentData($input['content_data']);
-
         // xf_attachment_data - attachment data
         // xf_attachment - link between attachment data & content
         return $this->fetchAllKeyed($this->_getDb()->limit('
@@ -199,10 +195,10 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 			FROM xf_attachment AS attachment
 			INNER JOIN xf_attachment_data AS data ON
 				(data.data_id = attachment.data_id)
-            WHERE attachment.content_id <> ? and data.user_id = ?
+            WHERE data.user_id = ?
             GROUP BY data.file_hash
             ORDER BY attachment.attach_date DESC
-        ', $limit, $offset), 'attachment_id', array($contentId, $viewingUser['user_id']));
+        ', $limit, $offset), 'attachment_id', array($viewingUser['user_id']));
     }
 
 
@@ -226,8 +222,9 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 
         $dataId = $oldAttachment['data_id'];
         $existingAttachmentId = $this->_getDb()->fetchOne('
-            select attachment_id 
-            from xf_attachment where data_id = ? and temp_hash = ?
+            select attachment_id
+            from xf_attachment
+            where data_id = ? and temp_hash = ?
             limit 1
         ', array($dataId, $hash));
         if ($existingAttachmentId)
