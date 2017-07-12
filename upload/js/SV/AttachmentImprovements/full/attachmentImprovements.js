@@ -1,6 +1,28 @@
 /** @param {jQuery} $ jQuery Object */
 !function($, window, document, _undefined)
 {
+    var xf_bbCodeToWysiwyg = XenForo.BbCodeWysiwygEditor.prototype.bbCodeToWysiwyg;
+    XenForo.BbCodeWysiwygEditor.prototype.bbCodeToWysiwyg = function(ed) {
+        var self = this,
+            val = this.$bbCodeTextArea.val();
+
+        if ($.trim(val).length == 0)
+        {
+            this.bbCodeToWysiwygSuccess(ed, {
+                html: '<p>' + (!$.browser.msie ? '<br />' : '') + '</p>'
+            });
+        }
+        else
+        {
+            var hash = $("input[name='attachment_hash']").val();
+            XenForo.ajax(
+                'index.php?editor/to-html',
+                { bbCode: this.$bbCodeTextArea.val(), attachment_hash: hash },
+                function(ajaxData) { self.bbCodeToWysiwygSuccess(ed, ajaxData); }
+            );
+        }
+    };
+
     var xf_getImageModal = XenForo.BbCodeWysiwygEditor.prototype.getImageModal;
     XenForo.BbCodeWysiwygEditor.prototype.getImageModal = function(ed) {
         var dialogUrl = this.dialogUrl;
@@ -72,7 +94,6 @@
 
                 var target = $form.find("input[name='attachmentIdNormalizer']").val();
                 var payload = {
-                    "_xfToken": $form.find("input[name='_xfToken']").val(),
                     "attachmentID": $attachment.data('attachmentid'),
                     "key": $form.find("input[name='key']").val(),
                     "hash": $form.find("input[name='hash']").val(),

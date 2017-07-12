@@ -180,6 +180,19 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         }
     }
 
+    public function actionToHtml()
+    {
+        $response = parent::actionToHtml();
+
+        if ($response instanceof XenForo_ControllerResponse_View)
+        {
+            $tempHash = $this->_input->filterSingle('attachment_hash', XenForo_Input::STRING);
+            $attachmentModel = $this->getModelFromCache('XenForo_Model_Attachment');
+            $response->params['attachments'] = $attachmentModel->prepareAttachments($attachmentModel->getAttachmentsByTempHash($tempHash));
+        }
+
+        return $response;
+    }
 
     /**
      * @return XenForo_Model_Attachment

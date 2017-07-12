@@ -7,9 +7,7 @@
   <admin_template_modifications/>
   <code_events/>
   <code_event_listeners>
-    <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Attachment" description="XenForo_ControllerPublic_Attachment"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerAdmin_Attachment" description="XenForo_ControllerAdmin_Attachment"/>
-    <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Editor" description="XenForo_ControllerPublic_Editor"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ViewAdmin_Attachment_View" description="XenForo_ViewAdmin_Attachment_View"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ViewPublic_Attachment_View" description="XenForo_ViewPublic_Attachment_View"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_Model_Attachment" description="XenForo_Model_Attachment"/>
@@ -18,6 +16,11 @@
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_AttachmentHandler_Post" description="XenForo_AttachmentHandler_Post"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_Model_Forum" description="XenForo_Model_Forum"/>
     <listener event_id="load_class" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerAdmin_Tools" description="XenForo_ControllerAdmin_Tools"/>
+    <listener event_id="load_class_bb_code" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_BbCode_Formatter_Wysiwyg" description="XenForo_BbCode_Formatter_Wysiwyg"/>
+    <listener event_id="load_class_bb_code" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_BbCode_Formatter_Base" description="XenForo_BbCode_Formatter_Base"/>
+    <listener event_id="load_class_controller" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Attachment" description="XenForo_ControllerPublic_Attachment"/>
+    <listener event_id="load_class_controller" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Editor" description="XenForo_ControllerPublic_Editor"/>
+    <listener event_id="load_class_controller" execute_order="5042" callback_class="SV_AttachmentImprovements_Listener" callback_method="load_class" active="1" hint="XenForo_ControllerPublic_Thread" description="XenForo_ControllerPublic_Thread"/>
   </code_event_listeners>
   <cron/>
   <email_templates/>
