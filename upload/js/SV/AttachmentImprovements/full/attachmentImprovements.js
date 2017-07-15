@@ -10,7 +10,7 @@
             dialogUrl = dialogUrl + "&" + href.substring(i + 1);
         }
         var self = this;
-        
+
         // Holder variable for uploads
         document.newAttachments = typeof document.newAttachments !== 'undefined' ? document.newAttachments : [];
 
@@ -172,6 +172,11 @@
                     XenForo.canonicalizeUrl(target),
                     payload,
                     function(ajaxData){
+                        var $model = $("#redactor_modal");
+                        if ($model.css('position') == 'fixed') {
+                            var offset = $model.offset();
+                            $model.css({position: 'absolute',top: offset.top, left:offset.left, 'margin-left':'0px', 'margin-top':'0px'});
+                        }
                         var $newAttachments = $(ajaxData.templateHtml);
 
                         $newAttachments
