@@ -17,31 +17,37 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 'key' => XenForo_Input::STRING
             ));
 
-            $attachmentHandler = $this->_getAttachmentModel()->getAttachmentHandler($contentType);
-            if (isset($input['content_type']) && $attachmentHandler && $attachmentHandler->canUploadAndManageAttachments($contentData))
+            if (isset($input['content_type']))
             {
-                if (!$input['hash'])
-                {
-                    $input['hash'] = $this->_input->filterSingle('temp_hash', XenForo_Input::STRING);
-                }
-                $attachmentData = $this->_getAttachmentData($input);
-
-                // Get extensions
-                $extensions = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
-                $attachmentData['attachmentConstraints']['extensions'] = $extensions;
-
-                // Filter attachments by extensions
-                $extensions = array_flip($extensions);
-                $attachmentData["existingAttachments"] = array_filter(
-                    $attachmentData["existingAttachments"], function($val) use ($extensions)
-                    {
-                        return isset($extensions[$val["extension"]]);
-                    }
-                );
-
-                // Merge in attachment data
-                $response->params = array_merge($response->params, $attachmentData);
+                return $response;
             }
+
+            $attachmentHandler = $this->_getAttachmentModel()->getAttachmentHandler($contentType);
+            if (!$attachmentHandler || !$attachmentHandler->canUploadAndManageAttachments($contentData))
+            {
+                return $response;
+            }
+            if (!$input['hash'])
+            {
+                $input['hash'] = $this->_input->filterSingle('temp_hash', XenForo_Input::STRING);
+            }
+            $attachmentData = $this->_getAttachmentData($input);
+
+            // Get extensions
+            $extensions = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
+            $attachmentData['attachmentConstraints']['extensions'] = $extensions;
+
+            // Filter attachments by extensions
+            $extensions = array_flip($extensions);
+            $attachmentData["existingAttachments"] = array_filter(
+                $attachmentData["existingAttachments"], function($val) use ($extensions)
+                {
+                    return isset($extensions[$val["extension"]]);
+                }
+            );
+
+            // Merge in attachment data
+            $response->params = array_merge($response->params, $attachmentData);
         }
 
         return $response;
@@ -65,7 +71,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         if (empty($attachment))
         {
             // todo: 404
-            return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array());    
+            return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array());
         }
 
         // Build response for attachment uploader
@@ -73,7 +79,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         $attachment = $attachmentModel->prepareAttachment($attachment);
 
         return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array(
-            'id' => $attachment['attachment_id'], 
+            'id' => $attachment['attachment_id'],
             'url' => XenForo_Link::buildPublicLink('full:attachments', $attachment),
             // _attachment is remapped to uploaderJson when rendered
             '_attachment' => $attachment,
@@ -108,10 +114,10 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
             $nextAttachments[$key] = $attachmentModel->prepareAttachment($nextAttachment);
         }
 
-        return $this->responseView('XenForo_ViewPublic_Base', 
-            'editor_dialog_image_improvements_multi_attachments', 
+        return $this->responseView('XenForo_ViewPublic_Base',
+            'editor_dialog_image_improvements_multi_attachments',
             array(
-                "attachments" => $nextAttachments, 
+                "attachments" => $nextAttachments,
                 "loadedAll" => sizeof($nextAttachments) != $numberToLoad
             )
         );
