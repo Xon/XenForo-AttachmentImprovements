@@ -93,6 +93,12 @@
                                 '<img src="' + ajaxData['url'] + '" class="attachFull bbCodeImage" alt="attachFull' + ajaxData['id'] + '" /> '
                             );
 
+                            $('.AttachmentUploader').trigger(
+                            {
+                                type: 'AttachmentUploaded',
+                                ajaxData: ajaxData.uploaderJson
+                            });
+
                             ed.modalClose();
                             ed.observeImages();
                             ed.syncCode();
