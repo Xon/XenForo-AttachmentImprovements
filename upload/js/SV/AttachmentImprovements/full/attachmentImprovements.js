@@ -79,6 +79,10 @@
                     "content_type": $form.find("input[name='content_type']").val(),
                 };
 
+                $("input[name^='content_data']", $form).each(function(i, ele){
+                    payload[$(ele).attr('name')] = $(ele).val();
+                });
+
                 if (!target) {
                     console.log("No target URL found.");
                     return;

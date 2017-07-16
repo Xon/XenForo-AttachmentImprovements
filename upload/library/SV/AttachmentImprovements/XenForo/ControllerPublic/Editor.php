@@ -17,7 +17,8 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 'key' => XenForo_Input::STRING
             ));
 
-            if (isset($input['content_type']))
+            $attachmentHandler = $this->_getAttachmentModel()->getAttachmentHandler($contentType);
+            if (isset($input['content_type']) && $attachmentHandler && $attachmentHandler->canUploadAndManageAttachments($contentData))
             {
                 if (!$input['hash'])
                 {
@@ -50,11 +51,17 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
     public function actionMakeNewAttachment()
     {
         $this->_routeMatch->setResponseType('json');
-        $hash = $this->_input->filterSingle('hash', XenForo_Input::STRING);
-        $attachmentId = $this->_input->filterSingle('attachmentID', XenForo_Input::STRING);
+        $input = $this->_input->filter(array(
+            'hash' => XenForo_Input::STRING,
+            'content_type' => XenForo_Input::STRING,
+            'content_data' => array(XenForo_Input::UINT, 'array' => true),
+            'attachmentId' => XenForo_Input::STRING
+        ));
+
+        $this->_assertCanUploadAndManageAttachments($input['hash'], $input['content_type'], $input['content_data']);
 
         $attachmentModel = $this->_getAttachmentModel();
-        $attachment = $attachmentModel->makeNewAttachment($attachmentId, $hash);
+        $attachment = $attachmentModel->makeNewAttachment($input['attachmentId'], $input['hash']);
         if (empty($attachment))
         {
             // todo: 404
