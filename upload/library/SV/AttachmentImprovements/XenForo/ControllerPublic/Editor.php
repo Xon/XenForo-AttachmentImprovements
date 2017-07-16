@@ -65,17 +65,11 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         $attachment["hash"] = $attachment["temp_hash"];
         $attachment = $attachmentModel->prepareAttachment($attachment);
 
-        // Render template
-        $dependencies = new XenForo_Dependencies_Public();
-        $dependencies->preRenderView();
-
-        // Add to response
-        $attachment["templateHtml"] = $dependencies->createTemplateObject('attachment_editor_attachment', array('attachment' => $attachment))->render();
-
         return $this->responseView('SV_AttachmentImprovements_XenForo_ViewPublic_Json', '', array(
             'id' => $attachment['attachment_id'], 
             'url' => XenForo_Link::buildPublicLink('full:attachments', $attachment),
-            'uploaderJson' => $attachment
+            // _attachment is remapped to uploaderJson when rendered
+            '_attachment' => $attachment,
         ));
     }
 
