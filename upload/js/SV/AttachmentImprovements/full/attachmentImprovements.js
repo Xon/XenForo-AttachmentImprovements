@@ -97,11 +97,13 @@
                                 '<img src="' + ajaxData['url'] + '" class="attachFull bbCodeImage" alt="attachFull' + ajaxData['id'] + '" /> '
                             );
 
-                            $('.AttachmentUploader').trigger(
-                            {
-                                type: 'AttachmentUploaded',
-                                ajaxData: ajaxData.uploaderJson
-                            });
+                            if (ajaxData.uploaderJson && !ed.$box.closest('form').hasClass("InlineMessageEditor")){
+                                $('.AttachmentUploader').trigger(
+                                {
+                                    type: 'AttachmentUploaded',
+                                    ajaxData: ajaxData.uploaderJson
+                                });
+                            }
 
                             ed.modalClose();
                             ed.observeImages();
