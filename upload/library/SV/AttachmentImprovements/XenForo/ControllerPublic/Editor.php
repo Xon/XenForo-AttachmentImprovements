@@ -17,13 +17,13 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 'key' => XenForo_Input::STRING
             ));
 
-            if (isset($input['content_type']))
+            if (empty($input['content_type']))
             {
                 return $response;
             }
 
-            $attachmentHandler = $this->_getAttachmentModel()->getAttachmentHandler($contentType);
-            if (!$attachmentHandler || !$attachmentHandler->canUploadAndManageAttachments($contentData))
+            $attachmentHandler = $this->_getAttachmentModel()->getAttachmentHandler($input['content_type']);
+            if (!$attachmentHandler || !$attachmentHandler->canUploadAndManageAttachments($input['content_data']))
             {
                 return $response;
             }
