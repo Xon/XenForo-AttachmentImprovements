@@ -61,13 +61,13 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
             'hash' => XenForo_Input::STRING,
             'content_type' => XenForo_Input::STRING,
             'content_data' => array(XenForo_Input::UINT, 'array' => true),
-            'attachmentId' => XenForo_Input::STRING
+            'attachmentID' => XenForo_Input::STRING
         ));
 
         $this->_assertCanUploadAndManageAttachments($input['hash'], $input['content_type'], $input['content_data']);
 
         $attachmentModel = $this->_getAttachmentModel();
-        $attachment = $attachmentModel->makeNewAttachment($input['attachmentId'], $input['hash']);
+        $attachment = $attachmentModel->makeNewAttachment($input['attachmentID'], $input['hash']);
         if (empty($attachment))
         {
             // todo: 404
