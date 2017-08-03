@@ -203,24 +203,22 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
         ', $limit, $offset), 'attachment_id', array($viewingUser['user_id']));
     }
 
-    static $showcaseContentTypes = array('showcase_item', 'showcase_review');
-    static $amsContentTypes = array('ams_article', 'ams_article_page', 'ams_comment', 'ams_review');
-    static $ubsContentTypes = array('ubs_blog', 'ubs_blog_entry', 'ubs_comment', 'ubs_review');
+    static $limitedContentTypes = array(
+        'showcase/attachment/do-upload' => array('showcase_item', 'showcase_review'),
+        'ams/attachment/do-upload' => array('ams_article', 'ams_article_page', 'ams_comment', 'ams_review'),
+        'ubs/attachment/do-upload' => array('ubs_blog', 'ubs_blog_entry', 'ubs_comment', 'ubs_review'),
+        'rms/attachment/do-upload' => array('rms_claim', 'rms_item', 'rms_review'),
+    );
 
     public function sv_getAttachmentUploadURL(array $input)
     {
         $contentType = $input['content_type'];
-        if (in_array($contentType, self::$showcaseContentTypes, true))
+        foreach(self::$limitedContentTypes as $uploadUrl => $types)
         {
-            return XenForo_Link::buildPublicLink('showcase/attachment/do-upload');
-        }
-        if (in_array($contentType, self::$amsContentTypes, true))
-        {
-            return XenForo_Link::buildPublicLink('ams/attachment/do-upload');
-        }
-        if (in_array($contentType, self::$ubsContentTypes, true))
-        {
-            return XenForo_Link::buildPublicLink('ubs/attachment/do-upload');
+            if (in_array($contentType, $types, true))
+            {
+                return XenForo_Link::buildPublicLink($uploadUrl);
+            }
         }
         return XenForo_Link::buildPublicLink('attachments/do-upload');
     }
@@ -228,19 +226,20 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
     protected function sv_getAllowedContentTypesSQL($contentType)
     {
         $db = $this->_getDb();
-        if (in_array($contentType, self::$showcaseContentTypes, true))
+        foreach(self::$limitedContentTypes as $uploadUrl => $types)
         {
-            return 'and content_type in ('.$db->quote(self::$showcaseContentTypes).')';
+            if (in_array($contentType, $types, true))
+            {
+                return 'and content_type in ('.$db->quote($types).')';
+            }
         }
-        if (in_array($contentType, self::$amsContentTypes, true))
+
+        $allType = array();
+        foreach(self::$limitedContentTypes as $uploadUrl => $types)
         {
-            return 'and content_type in ('.$db->quote(self::$amsContentTypes).')';
+            $allType += $types;
         }
-        if (in_array($contentType, self::$ubsContentTypes, true))
-        {
-            return 'and content_type in ('.$db->quote(self::$ubsContentTypes).')';
-        }
-        return 'and content_type not in ('.$db->quote(self::$showcaseContentTypes + self::$amsContentTypes + self::$ubsContentTypes).')';
+        return 'and content_type not in ('.$db->quote($allType).')';
     }
 
     public function makeNewAttachment($oldAttachmentId, $hash, $newContentType)
