@@ -22,7 +22,8 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 return $response;
             }
 
-            $attachmentHandler = $this->_getAttachmentModel()->getAttachmentHandler($input['content_type']);
+            $attachmentModel = $this->_getAttachmentModel();
+            $attachmentHandler = $attachmentModel->getAttachmentHandler($input['content_type']);
             if (!$attachmentHandler || !$attachmentHandler->canUploadAndManageAttachments($input['content_data']))
             {
                 return $response;
@@ -32,7 +33,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
                 $input['hash'] = $this->_input->filterSingle('temp_hash', XenForo_Input::STRING);
             }
             $attachmentData = $this->_getAttachmentData($input);
-            $attachmentData['href'] = $this->_getAttachmentUploadURL($input);
+            $attachmentData['href'] = $attachmentModel->sv_getAttachmentUploadURL($input);
 
             // Get extensions
             $extensions = preg_split('/\s+/', trim(XenForo_Application::getOptions()->attachmentImageExtensions));
@@ -54,28 +55,6 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         return $response;
     }
 
-    public function _getAttachmentUploadURL(array $input)
-    {
-        switch($input['content_type'])
-        {
-            case 'showcase_item':
-            case 'showcase_review':
-                return XenForo_Link::buildPublicLink('showcase/attachment/do-upload');
-            case 'ams_article':
-            case 'ams_article_page':
-            case 'ams_comment':
-            case 'ams_review':
-                return XenForo_Link::buildPublicLink('ams/attachment/do-upload');
-            case 'ubs_blog':
-            case 'ubs_blog_entry':
-            case 'ubs_comment':
-            case 'ubs_review':
-                return XenForo_Link::buildPublicLink('ubs/attachment/do-upload');
-            default:
-                return XenForo_Link::buildPublicLink('attachments/do-upload');
-        }
-    }
-
     public function actionMakeNewAttachment()
     {
         $this->_routeMatch->setResponseType('json');
@@ -89,7 +68,7 @@ class SV_AttachmentImprovements_XenForo_ControllerPublic_Editor extends XFCP_SV_
         $this->_assertCanUploadAndManageAttachments($input['hash'], $input['content_type'], $input['content_data']);
 
         $attachmentModel = $this->_getAttachmentModel();
-        $attachment = $attachmentModel->makeNewAttachment($input['attachmentID'], $input['hash']);
+        $attachment = $attachmentModel->makeNewAttachment($input['attachmentID'], $input['hash'], $input['content_type']);
         if (empty($attachment))
         {
             // todo: 404

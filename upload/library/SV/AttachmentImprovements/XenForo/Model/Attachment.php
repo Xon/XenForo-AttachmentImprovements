@@ -187,6 +187,8 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
     {
         $this->standardizeViewingUserReference($viewingUser);
 
+        $sql = $this->sv_getAllowedContentTypesSQL($input['content_type']);
+
         // xf_attachment_data - attachment data
         // xf_attachment - link between attachment data & content
         return $this->fetchAllKeyed($this->_getDb()->limit('
@@ -195,20 +197,59 @@ class SV_AttachmentImprovements_XenForo_Model_Attachment extends XFCP_SV_Attachm
 			FROM xf_attachment AS attachment
 			INNER JOIN xf_attachment_data AS data ON
 				(data.data_id = attachment.data_id)
-            WHERE data.user_id = ?
+            WHERE data.user_id = ? '.$sql.'
             GROUP BY data.file_hash
             ORDER BY attachment.attach_date DESC
         ', $limit, $offset), 'attachment_id', array($viewingUser['user_id']));
     }
 
+    static $showcaseContentTypes = array('showcase_item', 'showcase_review');
+    static $amsContentTypes = array('ams_article', 'ams_article_page', 'ams_comment', 'ams_review');
+    static $ubsContentTypes = array('ubs_blog', 'ubs_blog_entry', 'ubs_comment', 'ubs_review');
 
-    public function makeNewAttachment($oldAttachmentID, $hash)
+    public function sv_getAttachmentUploadURL(array $input)
+    {
+        $contentType = $input['content_type'];
+        if (in_array($contentType, self::$showcaseContentTypes, true))
+        {
+            return XenForo_Link::buildPublicLink('showcase/attachment/do-upload');
+        }
+        if (in_array($contentType, self::$amsContentTypes, true))
+        {
+            return XenForo_Link::buildPublicLink('ams/attachment/do-upload');
+        }
+        if (in_array($contentType, self::$ubsContentTypes, true))
+        {
+            return XenForo_Link::buildPublicLink('ubs/attachment/do-upload');
+        }
+        return XenForo_Link::buildPublicLink('attachments/do-upload');
+    }
+
+    protected function sv_getAllowedContentTypesSQL($contentType)
+    {
+        $db = $this->_getDb();
+        if (in_array($contentType, self::$showcaseContentTypes, true))
+        {
+            return 'and content_type in ('.$db->quote(self::$showcaseContentTypes).')';
+        }
+        if (in_array($contentType, self::$amsContentTypes, true))
+        {
+            return 'and content_type in ('.$db->quote(self::$amsContentTypes).')';
+        }
+        if (in_array($contentType, self::$ubsContentTypes, true))
+        {
+            return 'and content_type in ('.$db->quote(self::$ubsContentTypes).')';
+        }
+        return 'and content_type not in ('.$db->quote(self::$showcaseContentTypes + self::$amsContentTypes + self::$ubsContentTypes).')';
+    }
+
+    public function makeNewAttachment($oldAttachmentId, $hash, $newContentType)
     {
         if (empty($hash))
         {
             return null;
         }
-        $oldAttachment = $this->getAttachmentById($oldAttachmentID);
+        $oldAttachment = $this->getAttachmentById($oldAttachmentId);
         if (empty($oldAttachment))
         {
             return null;
