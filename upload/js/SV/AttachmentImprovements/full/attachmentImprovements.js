@@ -4,7 +4,7 @@
     var xf_getImageModal = XenForo.BbCodeWysiwygEditor.prototype.getImageModal;
     XenForo.BbCodeWysiwygEditor.prototype.getImageModal = function(ed) {
         var dialogUrl = this.dialogUrl;
-        var href = $("input#ctrl_uploader").data("href");
+        var href = $("#ctrl_uploader").data("href");
         if (href && this.dialogUrl) {
             var i = href.indexOf('?');
             dialogUrl = dialogUrl + "&" + href.substring(i + 1);
